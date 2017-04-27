@@ -113,24 +113,30 @@ class TestQuestion(Base):
         verbose_name = _("Pregunta de tipo test")
         verbose_name_plural = _("Preguntas de tipo test")
 
+    def get_question(self):
+        return self.question
+
 
 class TestOption(Base):
     """ Opciones a responder en una pregunta de tipo test """
-    question = models.ForeignKey(TestQuestion, blank=False, null=False)
+    test = models.ForeignKey(TestQuestion, blank=False, null=False)
     is_active = models.BooleanField(_("¿Quiere que esta opción sea visible?"), default=True)
+    is_answer = models.BooleanField(_("Solución a la pregunta tipo test (puede haber varias)"), default=False)
     text = models.CharField(_("Opción de pregunta tipo test"), max_length=512)
 
     class Meta:
         verbose_name = _("Opción a responder en pregunta de tipo test")
         verbose_name_plural = _("Opciones a responder en pregunta de tipo test")
 
+    def get_test(self):
+        return self.test
 
-class TestQuestionAnswer(Base):
-    """ Respuestas a preguntas de tipo test """
-    question = models.OneToOneField(TestQuestion, blank=False, null=False)
+    def get_is_active(self):
+        return self.is_active
 
-    # Enlace con la opción de esta pregunta. La solución debe ser única
-    answer = models.OneToOneField(TestOption)
+    def get_text(self):
+        return self.text
 
-    class Meta:
-        verbose_name = _("")
+
+
+
