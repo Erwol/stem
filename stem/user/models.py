@@ -14,7 +14,7 @@ class Base(models.Model):
     class Meta:
         abstract = True
 
-class CustomUser(AbstractUser):
+class User(AbstractUser):
     is_student = models.BooleanField(_("¿Es el usuario estudiante?"), default=True)
     date_of_birth = models.DateField(_("Fecha de nacimiento"), default=timezone.now)
 
