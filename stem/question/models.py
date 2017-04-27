@@ -1,9 +1,6 @@
 from django.db import models
 from user.models import User, Base
 from django.utils.translation import ugettext_lazy as _
-# Create your models here.
-
-
 
 
 class Story(Base):
@@ -12,6 +9,9 @@ class Story(Base):
     context = models.TextField(_("Contexto en el que se desarrolla el juego"), help_text=_("Ejemplo: Florinda y Torcuato están preparándose para una aventura..."))
     min_age = models.IntegerField(_("Edad mínima recomendada"), default=10)
     max_age = models.IntegerField(_("Edad máxima recomendada"), default=13)
+
+    #
+    per_game_questions_number = models.IntegerField(_("Número de preguntas por partida"), default=5)
 
     class Meta:
         verbose_name = _("Historia")
@@ -28,6 +28,10 @@ class Story(Base):
 
     def get_context(self):
         return self.context
+
+    def get_game_questions_number(self):
+        """ Número de preguntas que se mostrarán al jugador al niciar una partida """
+        return self.per_game_questions_number
 
     # TODO Añadir principio y final
 
