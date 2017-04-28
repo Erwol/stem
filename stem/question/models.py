@@ -53,7 +53,7 @@ class Question(Base):
         (TEST, _("Cuestionario")),
     )
 
-    question_type = models.CharField(_("Tipo de pregunta"), default=TEXT, max_length=128, help_text=_("Texto, cuestionario, etc"))
+    question_type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default=TEXT, max_length=128, help_text=_("Texto, cuestionario, etc"))
     image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True)
 
 
@@ -117,21 +117,9 @@ class TextQuestionAnswer(Base):
         return self.answer
 
 
-class TestQuestion(Base):
-    """ Preguntas de tipo test o cuestionario. Deben tener enlazadas algunas opciones """
-    question = models.ForeignKey(Question, blank=False, null=False)
-
-    class Meta:
-        verbose_name = _("Pregunta de tipo test")
-        verbose_name_plural = _("Preguntas de tipo test")
-
-    def get_question(self):
-        return self.question
-
-
 class TestOption(Base):
     """ Opciones a responder en una pregunta de tipo test """
-    test = models.ForeignKey(TestQuestion, blank=False, null=False)
+    question = models.ForeignKey(Question, blank=False, null=False)
     is_active = models.BooleanField(_("¿Quiere que esta opción sea visible?"), default=True)
     is_answer = models.BooleanField(_("Solución a la pregunta tipo test (puede haber varias)"), default=False)
     text = models.CharField(_("Opción de pregunta tipo test"), max_length=512)
