@@ -6,12 +6,19 @@ from django.utils.translation import ugettext_lazy as _
 class Story(Base):
     """ Historia """
     name = models.CharField(_("Nombre de la historia"), max_length=128, blank=False)
-    context = models.TextField(_("Contexto en el que se desarrolla el juego"), help_text=_("Ejemplo: Florinda y Torcuato están preparándose para una aventura..."))
+    context = models.TextField(_("Contexto en el que se desarrolla el juego"), help_text=_("Ejemplo: Florinda y Torcuato están preparándose para una aventura, ¿te animas a ayudarlos?"))
     min_age = models.IntegerField(_("Edad mínima recomendada"), default=10)
     max_age = models.IntegerField(_("Edad máxima recomendada"), default=13)
 
     #
     per_game_questions_number = models.IntegerField(_("Número de preguntas por partida"), default=5)
+
+    cover = models.ImageField(_("Imagen de portada de la historia (500 x 500)"))
+
+    introduction_image = models.ImageField(_("Imagen que se muestra al inicio de la partida"))
+    introduction_text = models.TextField(_("Texto de introducción a la historia"), help_text=_("Es el texto que se muestra al iniciar el juego"))
+    end_image = models.ImageField(_("Imagen final"))
+    end_text = models.TextField(_("Texto que da fin a la historia"), help_text=_("Ejemplo: ¡Gracias a ti Torcuato lo ha logrado!"))
 
     class Meta:
         verbose_name = _("Historia")
@@ -48,6 +55,7 @@ class Question(Base):
 
     question_type = models.CharField(_("Tipo de pregunta"), default=TEXT, max_length=128, help_text=_("Texto, cuestionario, etc"))
     image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True)
+
 
     class Meta:
         verbose_name = _("Pregunta")
