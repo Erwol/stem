@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, TestOption, TextQuestionAnswer, TextQuestion, Cheat
+from .models import Question, TestOption, TextQuestion, Cheat, Story
 # Register your models here.
 
 class CheatInline(admin.StackedInline):
@@ -10,16 +10,19 @@ class CheatInline(admin.StackedInline):
 
 class TestOptionInline(admin.StackedInline):
     model = TestOption
+    max_num = 5
     # Includes the answer
 
-
+class TextQuestionInline(admin.StackedInline):
+    model = TextQuestion
+    max_num = 1
 
 class QuestionAdmin(admin.ModelAdmin):
-    inlines = (CheatInline, TestOptionInline, )
+    inlines = (CheatInline, TestOptionInline, TextQuestionInline, )
 
-    # TODO When the admin selects one or another question type, a different inline appears https://docs.djangoproject.com/en/1.10/ref/contrib/admin/javascript/
 
 
 
 
 admin.site.register(Question, QuestionAdmin)
+admin.site.register(Story)
