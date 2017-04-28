@@ -8,7 +8,7 @@ class CheatInline(admin.StackedInline):
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    pass
+    inlines = (CheatInline, )
 
 
 

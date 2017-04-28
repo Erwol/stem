@@ -44,7 +44,7 @@ class Story(Base):
 
 class Question(Base):
     """ Preguntas de la historia """
-    story = models.ForeignKey(Story, blank=False, null=False)
+    story = models.ForeignKey(Story, help_text=_("Historia a la que pertenece la pregunta"), blank=False, null=False, )
 
     TEXT = 0
     TEST = 1
@@ -72,7 +72,7 @@ class Cheat(Base):
     """ Pistas de las preguntas """
     question = models.ForeignKey(Question, blank=False, null=False)
     order = models.IntegerField(_("Órden de las pistas, del 0 a n"), default=0)
-
+    cheat_text = models.TextField(_("Texto de la pista"))
     class Meta:
         verbose_name = _("Pista")
         verbose_name_plural = _("Pistas")
