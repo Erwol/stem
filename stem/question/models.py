@@ -86,8 +86,8 @@ class Cheat(Base):
 class TextQuestion(Base):
     """ Preguntas de tipo texto """
     question = models.ForeignKey(Question, blank=False, null=False)
-    text = models.TextField(_("Enunciado de la pregunta."))
-
+    question_text = models.TextField(_("Enunciado de la pregunta."))
+    answer = models.TextField(_("Respuesta a la pregunta"))
     class Meta:
         verbose_name = _("Pregunta de tipo texto")
         verbose_name_plural = _("Preguntas de tipo texto")
@@ -99,22 +99,9 @@ class TextQuestion(Base):
         return self.text
 
     def get_answer(self):
-        return self.text # TODO Reverse
-
-class TextQuestionAnswer(Base):
-    """ Respuestas a preguntas de tipo texto """
-    question = models.OneToOneField(TextQuestion, null=False, blank=False, related_name="textanswer")
-    answer = models.TextField(_("Respuesta a la pregunta"))
-
-    class Meta:
-        verbose_name = _("Respuesta a pregunta de texto")
-        verbose_name_plural = _("Respuestas a preguntas de texto")
-
-    def get_question(self):
-        return self.question
-
-    def get_answer(self):
         return self.answer
+
+
 
 
 class TestOption(Base):
