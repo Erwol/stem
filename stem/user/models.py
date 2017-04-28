@@ -16,8 +16,9 @@ class Base(models.Model):
         abstract = True
 
 class User(AbstractUser):
-    is_student = models.BooleanField(_("¿Es el usuario estudiante?"), default=True)
+    is_student = models.BooleanField(_("Es estudiante"), default=True)
     date_of_birth = models.DateField(_("Fecha de nacimiento"), default=timezone.now)
+    email = models.EmailField(_("Correo electrónico"), max_length=254, unique=True, blank=False)
 
     class Meta:
         verbose_name = _("Usuario")
