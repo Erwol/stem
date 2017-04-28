@@ -55,7 +55,7 @@ class Question(Base):
 
     question_type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default=TEXT, max_length=128, help_text=_("Texto, cuestionario, etc"))
     image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True)
-
+    question_text = models.TextField(_("Enunciado de la pregunta."))
 
     class Meta:
         verbose_name = _("Pregunta")
@@ -83,10 +83,10 @@ class Cheat(Base):
     def get_order(self):
         return self.order
 
-class TextQuestion(Base):
-    """ Preguntas de tipo texto """
+
+class TextQuestionAnswer(Base):
+    """ El enunciado está en la pregunta; la respuesta aquí """
     question = models.ForeignKey(Question, blank=False, null=False)
-    question_text = models.TextField(_("Enunciado de la pregunta."))
     answer = models.TextField(_("Respuesta a la pregunta"))
     class Meta:
         verbose_name = _("Pregunta de tipo texto")
