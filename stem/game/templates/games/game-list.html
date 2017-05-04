@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+    <table>
+        <thead>
+        <tr>
+            <th>Partida</th>
+            <th>Historia</th>
+            <th>Estado</th>
+            <th>Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in object_list %}
+            <tr>
+                <td>
+                    {{ element.id }}
+                </td>
+                <td>
+                    {{ element.story.name }}
+                </td>
+                <td>
+                    {{ element.is_finished }}
+                </td>
+                <td>
+                    <a href="{% url 'question-list' pk=element.id %}">
+                        <span></span>Comenzar la aventura
+                    </a>
+                    <a href="{% url 'game-delete' pk=element.id %}">
+                        <span></span>Borrar
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'game-create' %}">
+        <span></span>Crear Partida
+    </a>
+    <a href="{% url 'logout' %}">
+        <span></span>Logout
+    </a>
+{% endblock %}

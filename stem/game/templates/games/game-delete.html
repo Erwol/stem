@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+
+    <fieldset>
+        <form method="post">{% csrf_token %}
+        ¿Estás seguro que deseas borrar el usuario "{{ object }}"?
+        <input type="submit" value="Confirmar" />
+        </form>
+    </fieldset>
+{% endblock %}

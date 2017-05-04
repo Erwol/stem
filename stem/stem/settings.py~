@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'user.User'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'game',
-    'templates',
     'question',
 ]
 
@@ -57,7 +58,7 @@ ROOT_URLCONF = 'stem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [''],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,15 +127,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/uploads/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-STATICFILES_DIRS = (BASE_DIR, 'static')
-STATIC_URL = '/static/'
-
-AUTH_USER_MODEL = "user.User"
-
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_URL = "logout"
-

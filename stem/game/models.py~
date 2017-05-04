@@ -1,5 +1,3 @@
-# coding=utf-8
-from __future__ import unicode_literals
 from django.db import models
 from user.models import Base, User
 from question.models import Story, Question
@@ -16,7 +14,7 @@ class Game(Base):
     story = models.ForeignKey(Story, help_text=_("Historia seleccionada por el jugador"))
     is_finished = models.BooleanField(_("¿Ha terminado el juego?"), default=False)
     is_started = models.BooleanField(_("¿Ha comenzado el juego?"), default=False)
-    actual_question = models.IntegerField(default=1)
+
 
     class Meta:
         verbose_name = "Partida"
@@ -38,3 +36,12 @@ class Game(Base):
 
     def get_is_started(self):
         return self.is_started
+
+
+class GameQuestions(Base):
+    """ Original PartidaPregunta | Preguntas asociadas a una partida """
+    game = models.ForeignKey(Game)
+    question = models.ForeignKey(Question)
+
+    class Meta:
+        verbose_name = _("Preguntas de la partida")

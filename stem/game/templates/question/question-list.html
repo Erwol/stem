@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+    <table>
+        <thead>
+        <tr>
+            <th>Imagen</th>
+            <th>Pregunta</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in object_list %}
+            <tr>
+                <td>
+                    <img src="{{ element.image.url }}">
+                </td>
+                <td>
+                    {{ element.question_text }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="/game/{{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="/game/{{ page_obj.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}
