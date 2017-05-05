@@ -2,6 +2,9 @@
 from django.db import models
 from user.models import User, Base
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+from django.core.validators import MinValueValidator
 
 
 class Story(Base):
@@ -12,14 +15,10 @@ class Story(Base):
     max_age = models.IntegerField(_("Edad máxima recomendada"), default=13)
 
     #
-    per_game_questions_number = models.IntegerField(_("Número de preguntas por partida"), default=5)
+    questions_number = models.IntegerField(editable=False, help_text=_("Número autogenerado de preguntas de una historia"))
 
-    cover = models.ImageField(_("Imagen de portada de la historia (500 x 500)"))
+    cover = models.ImageField(_("Imagen de portada de la historia (500 x 500)"), blank=True, upload_to="covers")
 
-    introduction_image = models.ImageField(_("Imagen que se muestra al inicio de la partida"))
-    introduction_text = models.TextField(_("Texto de introducción a la historia"), help_text=_("Es el texto que se muestra al iniciar el juego"))
-    end_image = models.ImageField(_("Imagen final"))
-    end_text = models.TextField(_("Texto que da fin a la historia"), help_text=_("Ejemplo: ¡Gracias a ti Torcuato lo ha logrado!"))
 
     class Meta:
         verbose_name = _("Historia")
@@ -37,23 +36,27 @@ class Story(Base):
     def get_context(self):
         return self.context
 
-    def get_game_questions_number(self):
-        """ Número de preguntas que se mostrarán al jugador al niciar una partida """
-        return self.per_game_questions_number
+    def get_questions_number(self):
+        """ Número total y autogenerado de preguntas """
+        return self.questions_number
 
-    # TODO Añadir principio y final
+    def __str__(self):
+        return self.name
+
 
 class Question(Base):
     """ Preguntas de la historia """
     story = models.ForeignKey(Story, help_text=_("Historia a la que pertenece la pregunta"), blank=False, null=False, )
+    order = models.PositiveIntegerField(_("Orden de la pregunta en el juego"), validators=[MinValueValidator(1)])
 
     QUESTION_TYPES = (
         ('TEXTO', _('Texto')),
         ('CUESTIONARIO', _('Cuestionario')),
+        ('VINETA', _('Viñeta')),
     )
 
     question_type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default='TEXTO', max_length=128, help_text=_("Texto, cuestionario, etc"))
-    image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True)
+    image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True, blank=True)
     question_text = models.TextField(_("Enunciado de la pregunta."))
 
     class Meta:
@@ -66,6 +69,18 @@ class Question(Base):
     def get_image(self):
         return self.image
 
+    def get_order(self):
+        return self.order
+
+    def __str__(self):
+        return "Pregunta de la historia " + self.story.name
+
+@receiver(post_save, sender=Question)
+def increase_story_questions_number(sender, instance=None, created=False, **kwargs):
+    if created:
+        print(sender)
+        story = sender.story
+        print(story)
 
 class Cheat(Base):
     """ Pistas de las preguntas """

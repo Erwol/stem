@@ -4,7 +4,7 @@
 
     <fieldset>
         <form method="post">{% csrf_token %}
-        ¿Estás seguro que deseas borrar el usuario "{{ object }}"?
+        ¿Estás seguro que deseas borrar la partida {{ object.pk }}?
         <input type="submit" value="Confirmar" />
         </form>
     </fieldset>
