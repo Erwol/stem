@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy, reverse
+from django.contrib.auth.views import login
+from django.views.generic import FormView, ListView, DetailView, CreateView, DeleteView, UpdateView
 
-# Create your views here.
+
+
+def custom_login(request, **kwargs):
+
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('home'))
+    else:
+        return login(request, **kwargs)

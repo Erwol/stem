@@ -39,9 +39,4 @@ class GameQuestionListView(LoginRequiredMixin, ListView):
         return Question.objects.filter(story__in=
            Game.objects.filter(pk__in=self.kwargs['pk']).values('story'))
 
-def custom_login(request, **kwargs):
 
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('home'))
-    else:
-        return login(request, **kwargs)

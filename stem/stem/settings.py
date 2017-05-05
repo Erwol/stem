@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'user',
     'game',
     'templates',
-    'question',
 ]
 
 MIDDLEWARE = [
