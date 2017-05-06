@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+
+{# Just a simple question #}
+
+{{ question.question_text }}
+
+
+<form action="{% url 'game:game-controller' %}" method="post">
+{% csrf_token %}
+    <input type="hidden" name="question_id" value="{{ question.id }}">
+    <input type="submit" value="Siguiente" />
+</form>
+
+{% endblock %}

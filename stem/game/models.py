@@ -124,11 +124,12 @@ def decrease_story_questions_number(sender, instance=None, created=False, **kwar
 class Cheat(Base):
     """ Pistas de las preguntas """
     question = models.ForeignKey(Question, blank=False, null=False)
-    order = models.IntegerField(_("Órden de las pistas, del 0 a n"), default=0)
+    order = models.IntegerField(_("Órden de las pistas, del 1 a n"), default=1, validators=[MinValueValidator(1)], help_text=_("No repitas el orden de las pistas"))
     cheat_text = models.TextField(_("Texto de la pista"))
     class Meta:
         verbose_name = _("Pista")
         verbose_name_plural = _("Pistas")
+        unique_together = ('question', 'order')
 
     def get_question(self):
         return self.question
@@ -142,8 +143,8 @@ class TextQuestionAnswer(Base):
     question = models.ForeignKey(Question, blank=False, null=False)
     answer = models.TextField(_("Respuesta a la pregunta"))
     class Meta:
-        verbose_name = _("Pregunta de tipo texto")
-        verbose_name_plural = _("Preguntas de tipo texto")
+        verbose_name = _("Respuesta a pregunta de tipo texto")
+        verbose_name_plural = _("Respuestas a preguntas de tipo texto")
 
     def get_question(self):
         return self.question

@@ -3,13 +3,13 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.views import login
 from django.views.generic import FormView, ListView, DetailView, CreateView, DeleteView, UpdateView
-
+from django.shortcuts import render, redirect, get_object_or_404
 from game.models import *
 
 class GameListView(LoginRequiredMixin, ListView):
     model = Game
     template_name = "games/game-list.html"
-    login_url = 'login'
+    login_url = 'user:login'
 
     def get_queryset(self):
         return Game.objects.filter(user=self.request.user)
@@ -18,8 +18,8 @@ class GameCreateView(LoginRequiredMixin, CreateView):
     model = Game
     fields = ['story']
     template_name = "games/game-create.html"
-    login_url = 'login'
-    success_url = reverse_lazy('home')
+    login_url = 'user:login'
+    success_url = reverse_lazy('game:index')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -28,7 +28,7 @@ class GameCreateView(LoginRequiredMixin, CreateView):
 class GameDeleteView(LoginRequiredMixin, DeleteView):
     model = Game
     template_name = "games/game-delete.html"
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('game:index')
 
 class GameQuestionListView(LoginRequiredMixin, ListView):
     model = Question
@@ -40,3 +40,61 @@ class GameQuestionListView(LoginRequiredMixin, ListView):
            Game.objects.filter(pk__in=self.kwargs['pk']).values('story'))
 
 
+
+# Inicializa y recupera previas partidas del juego
+def play_game(request, game_id):
+    # Comprobamos método de acceso a la función
+    if(request.method == "POST"):
+        game_id = request.POST.get("game_id", )
+        # TODO Comprobar si la partida existe realmente y está asociada a este usuario
+        game = get_object_or_404(Game, pk=game_id)
+        story = game.story
+
+        if(story.questions_number == 0):
+            return HttpResponseRedirect(reverse('game:index', )) # TODO Devolver errores
+
+
+        request.session["game_id"] = game.id
+        request.session["story_id"] = story.id
+        request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
+
+        return redirect('game:game-controller')
+        # return redirect('view', var1=value1)
+
+
+    else:
+        return HttpResponseRedirect(reverse('game:index',))
+
+
+def game_controller(request):
+    """ Controla la ejecución secuencial de las preguntas """
+    # El juego termina cuando la pregunta actual es igual al número total de preguntas
+    actual_question = request.session["actual_question"]
+    story_id = request.session["story_id"]
+    game_id = request.session["game_id"]
+
+    game = get_object_or_404(Game, pk=game_id)
+    story = get_object_or_404(Story, pk=story_id)
+
+    if actual_question >= story.get_questions_number():
+        # TODO Mandar al usuario a una pantalla en la que vea los resultados
+        game.is_finished = True # Guardando este valor, esta partida será guardada como completada, aunque en un futuro se alteren las preguntas del test
+        game.save()
+        return HttpResponseRedirect(reverse('game:index', ))
+
+    # Si el juego no ha terminado, se aumenta en una unidad la pregunta actual (1 es el mínimo)
+    actual_question += 1
+    request.session["actual_question"] = actual_question
+
+    # Guardamos el progreso en la base de datos por si el usuario quiere continuar más tarde
+    game.actual_question = actual_question
+    game.save()
+
+    # Finalmente buscamos la pregunta actual
+    # Se trata como a un array, por lo que accedemos al elemento actual_question - 1.
+    question = Question.objects.filter(story=story).order_by('order')[actual_question - 1]
+
+    return render(request, 'question/question.html', {
+        'question': question,
+        'progress': 10, # TODO Calcular el progreso y mostrarlo en un porcentaje?
+    })

@@ -11,22 +11,32 @@
         </tr>
         </thead>
         <tbody>
-        {% for element in object_list %}
+        {% for game in object_list %}
             <tr>
                 <td>
-                    {{ element.id }}
+                    {{ game.id }}
                 </td>
                 <td>
-                    {{ element.story.name }}
+                    {{ game.story.name }}
                 </td>
                 <td>
-                    {{ element.is_finished }}
+                    {% if game.is_finished %}
+                        Terminado
+                    {% else %}
+                        En progreso
+                    {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'question-list' pk=element.id %}">
-                        <span></span>Comenzar la aventura
-                    </a>
-                    <a href="{% url 'game-delete' pk=element.id %}">
+                    {# Sustituir GET por POST. Paso la id de dos formas a modo de ejemplo. #}
+
+                    <form action="{% url 'game:play-game' game.id %}" method="post">
+                    {% csrf_token %}
+                        <input type="hidden" name="game_id" value="{{ game.id }}">
+                        <input type="submit" value="Comenzar la aventura" />
+                    </form>
+                        <span></span>
+
+                    <a href="{% url 'game:game-delete' pk=game.id %}">
                         <span></span>Borrar
                     </a>
                 </td>
@@ -34,10 +44,7 @@
         {% endfor %}
         </tbody>
     </table>
-    <a href="{% url 'game-create' %}">
+    <a href="{% url 'game:game-create' %}">
         <span></span>Crear Partida
-    </a>
-    <a href="{% url 'logout' %}">
-        <span></span>Logout
     </a>
 {% endblock %}
