@@ -27,13 +27,16 @@
                     {% else %}
                         Sin comenzar
                     {% endif %}
-                </td>
-                <td>
+
                     {% if not game.is_finished %}
                         <form action="{% url 'game:play-game' game.id %}" method="post">
                         {% csrf_token %}
                             <input type="hidden" name="game_id" value="{{ game.id }}">
-                            <input type="submit" value="Comenzar la aventura" />
+                            {% if game.actual_question > 0 %}
+                                <input type="submit" value="Continuar la aventura" />
+                            {% else %}
+                                <input type="submit" value="Comenzar la aventura" />
+                            {% endif %}
                         </form>
                     {% endif %}
 

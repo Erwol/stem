@@ -84,9 +84,9 @@ class Question(Base):
         ('VINETA', _('Viñeta')),
     )
 
-    question_type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default='TEXTO', max_length=128, help_text=_("Texto, cuestionario, etc"))
+    type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default='TEXTO', max_length=128, help_text=_("Texto, cuestionario, etc"))
     image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True, blank=True)
-    question_text = models.TextField(_("Enunciado de la pregunta."))
+    text = models.TextField(_("Enunciado de la pregunta."))
 
     class Meta:
         verbose_name = _("Pregunta")
@@ -125,7 +125,7 @@ class Cheat(Base):
     """ Pistas de las preguntas """
     question = models.ForeignKey(Question, blank=False, null=False)
     order = models.IntegerField(_("Órden de las pistas, del 1 a n"), default=1, validators=[MinValueValidator(1)], help_text=_("No repitas el orden de las pistas"))
-    cheat_text = models.TextField(_("Texto de la pista"))
+    text = models.TextField(_("Texto de la pista"))
     class Meta:
         verbose_name = _("Pista")
         verbose_name_plural = _("Pistas")

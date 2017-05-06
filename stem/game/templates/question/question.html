@@ -4,13 +4,64 @@
 
 {# Just a simple question #}
 
-{{ question.question_text }}
+{% if question.image %}
+    <img src="{{ question.image.url }}">
+{% endif %}
 
-
+{{ question.text }}
 <form action="{% url 'game:save-response' %}" method="post">
 {% csrf_token %}
+    {% if question.type == "TEXTO" %}
+        <span>Respuesta: </span><input type="text" name="text_answer">
+    {% elif question.type == "CUESTIONARIO" %}
+        {% for answer in answers %}
+            <input type="radio" name="gender" value="{{ answer.id }}" > {{ answer.text }}<br>
+        {% endfor %}
+    {% endif %}
     <input type="hidden" name="question_id" value="{{ question.id }}">
     <input type="submit" value="Siguiente" />
 </form>
+
+{% if cheat_number > 0 %}
+    <button id="cheat">¡Dame pistas!</button>
+
+    <script>
+        var cheat_count = 0;
+        var cheat_number = "{{ cheat_number }}"; // Número de pistas máximo
+        var question_id = "{{ question.id }}";
+        document.getElementById("cheat").addEventListener("click", function () {
+            if(cheat_count >= cheat_number){
+                alert("No hay más pistas :D SUERTE PUTO");
+                return;
+            }
+            var request = new XMLHttpRequest();
+            request.open('GET', '/question-cheat/' + question_id + '/' + cheat_count, true);
+
+            request.onload = function() {
+                if (request.status >= 200 && request.status < 400) {
+                    // Success!
+                    var resp = request.responseText;
+                    alert("PISTA!!" + resp);
+                } else {
+                // We reached our target server, but it returned an error
+
+                }
+            };
+
+            request.onerror = function() {
+            // There was a connection error of some sort
+            };
+
+            request.send();
+
+            console.log(cheat_count + ", " + question_id);
+            cheat_count ++;
+        });
+
+
+
+    </script>
+{% endif %}
+
 
 {% endblock %}

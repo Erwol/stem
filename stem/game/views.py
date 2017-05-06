@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotAllowed, HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.views import login
 from django.views.generic import FormView, ListView, DetailView, CreateView, DeleteView, UpdateView
@@ -77,8 +77,17 @@ def game_controller(request):
     # Accedemos a la pregunta que le toca al usuario
     question = Question.objects.filter(story=story).order_by('order')[actual_question]
 
+    # Si la pregunta es de tipo test, pasamos el cuestionario
+    answers = list()
+    if question.type == "CUESTIONARIO":
+        answers = TestOption.objects.filter(question=question)
+
+    # Y también enviamos el número de pistas que tiene la pregunta
+    cheat_number = Cheat.objects.filter(question=question).count()
     return render(request, 'question/question.html', {
         'question': question,
+        'answers': answers,
+        'cheat_number': cheat_number,
         'progress': 10, # TODO Calcular el progreso y mostrarlo en un porcentaje?
     })
 
@@ -105,3 +114,15 @@ def save_response(request):
         return HttpResponseRedirect(reverse('game:home', ))
 
     return HttpResponseRedirect(reverse('game:game-controller', ))
+
+
+def get_cheat(request, question_id, cheat_count):
+    if(request.method == "GET"):
+        question = get_object_or_404(Question, pk=question_id)
+        if Cheat.objects.filter(question=question)[int(cheat_count)]:
+            cheat = Cheat.objects.filter(question=question)[int(cheat_count)]
+            return HttpResponse(cheat.text, status=200)
+        else:
+            return HttpResponse(status=404)
+    else:
+        return HttpResponseNotAllowed()
