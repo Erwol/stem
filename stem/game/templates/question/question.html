@@ -7,7 +7,7 @@
 {{ question.question_text }}
 
 
-<form action="{% url 'game:game-controller' %}" method="post">
+<form action="{% url 'game:save-response' %}" method="post">
 {% csrf_token %}
     <input type="hidden" name="question_id" value="{{ question.id }}">
     <input type="submit" value="Siguiente" />

@@ -10,6 +10,6 @@ app_name = 'user'
 
 urlpatterns = [
     #url(r'login/$', custom_login, name='login'),
-    url(r'^login/$', custom_login, name='index'), # TODO Susutituir home por web real con información del proyecto
+    url(r'^$', custom_login, name='index'), # TODO Susutituir home por web real con información del proyecto
     url(r'logout/$', auth_views.logout, name='logout'), # Elimina por defecto todas las keys de sesión
 ]

@@ -22,19 +22,20 @@
                 <td>
                     {% if game.is_finished %}
                         Terminado
-                    {% else %}
+                    {% elif game.actual_question > 0 %}
                         En progreso
+                    {% else %}
+                        Sin comenzar
                     {% endif %}
                 </td>
                 <td>
-                    {# Sustituir GET por POST. Paso la id de dos formas a modo de ejemplo. #}
-
-                    <form action="{% url 'game:play-game' game.id %}" method="post">
-                    {% csrf_token %}
-                        <input type="hidden" name="game_id" value="{{ game.id }}">
-                        <input type="submit" value="Comenzar la aventura" />
-                    </form>
-                        <span></span>
+                    {% if not game.is_finished %}
+                        <form action="{% url 'game:play-game' game.id %}" method="post">
+                        {% csrf_token %}
+                            <input type="hidden" name="game_id" value="{{ game.id }}">
+                            <input type="submit" value="Comenzar la aventura" />
+                        </form>
+                    {% endif %}
 
                     <a href="{% url 'game:game-delete' pk=game.id %}">
                         <span></span>Borrar

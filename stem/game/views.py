@@ -9,7 +9,7 @@ from game.models import *
 class GameListView(LoginRequiredMixin, ListView):
     model = Game
     template_name = "games/game-list.html"
-    login_url = 'user:login'
+    # login_url = 'user:login'
 
     def get_queryset(self):
         return Game.objects.filter(user=self.request.user)
@@ -19,7 +19,7 @@ class GameCreateView(LoginRequiredMixin, CreateView):
     fields = ['story']
     template_name = "games/game-create.html"
     login_url = 'user:login'
-    success_url = reverse_lazy('game:index')
+    success_url = reverse_lazy('game:home')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -28,7 +28,7 @@ class GameCreateView(LoginRequiredMixin, CreateView):
 class GameDeleteView(LoginRequiredMixin, DeleteView):
     model = Game
     template_name = "games/game-delete.html"
-    success_url = reverse_lazy('game:index')
+    success_url = reverse_lazy('game:home')
 
 class GameQuestionListView(LoginRequiredMixin, ListView):
     model = Question
@@ -51,7 +51,7 @@ def play_game(request, game_id):
         story = game.story
 
         if(story.questions_number == 0):
-            return HttpResponseRedirect(reverse('game:index', )) # TODO Devolver errores
+            return HttpResponseRedirect(reverse('game:home', )) # TODO Devolver errores
 
 
         request.session["game_id"] = game.id
@@ -63,7 +63,8 @@ def play_game(request, game_id):
 
 
     else:
-        return HttpResponseRedirect(reverse('game:index',))
+        return HttpResponseRedirect(reverse('game:home',))
+
 
 
 def game_controller(request):
@@ -71,18 +72,25 @@ def game_controller(request):
     # El juego termina cuando la pregunta actual es igual al número total de preguntas
     actual_question = request.session["actual_question"]
     story_id = request.session["story_id"]
-    game_id = request.session["game_id"]
 
-    game = get_object_or_404(Game, pk=game_id)
     story = get_object_or_404(Story, pk=story_id)
+    # Accedemos a la pregunta que le toca al usuario
+    question = Question.objects.filter(story=story).order_by('order')[actual_question]
 
-    if actual_question >= story.get_questions_number():
-        # TODO Mandar al usuario a una pantalla en la que vea los resultados
-        game.is_finished = True # Guardando este valor, esta partida será guardada como completada, aunque en un futuro se alteren las preguntas del test
-        game.save()
-        return HttpResponseRedirect(reverse('game:index', ))
+    return render(request, 'question/question.html', {
+        'question': question,
+        'progress': 10, # TODO Calcular el progreso y mostrarlo en un porcentaje?
+    })
 
-    # Si el juego no ha terminado, se aumenta en una unidad la pregunta actual (1 es el mínimo)
+
+# Control del guardado de respuestas
+def save_response(request):
+    """ Sólo se guarda la respuesta y se avanza en la pregunta si el usuario la ha respondido """
+    actual_question = request.session["actual_question"]
+    story_id = request.session["story_id"]
+    game_id = request.session["game_id"]
+    story = get_object_or_404(Story, pk=story_id)
+    game = get_object_or_404(Game, pk=game_id)
     actual_question += 1
     request.session["actual_question"] = actual_question
 
@@ -90,11 +98,10 @@ def game_controller(request):
     game.actual_question = actual_question
     game.save()
 
-    # Finalmente buscamos la pregunta actual
-    # Se trata como a un array, por lo que accedemos al elemento actual_question - 1.
-    question = Question.objects.filter(story=story).order_by('order')[actual_question - 1]
+    if actual_question >= story.get_questions_number():
+        # TODO Mandar al usuario a una pantalla en la que vea los resultados
+        game.is_finished = True # Guardando este valor, esta partida será guardada como completada, aunque en un futuro se alteren las preguntas del test
+        game.save()
+        return HttpResponseRedirect(reverse('game:home', ))
 
-    return render(request, 'question/question.html', {
-        'question': question,
-        'progress': 10, # TODO Calcular el progreso y mostrarlo en un porcentaje?
-    })
+    return HttpResponseRedirect(reverse('game:game-controller', ))

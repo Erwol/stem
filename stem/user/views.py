@@ -9,6 +9,6 @@ from django.views.generic import FormView, ListView, DetailView, CreateView, Del
 def custom_login(request, **kwargs):
 
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('home'))
+        return HttpResponseRedirect(reverse('game:home'))
     else:
         return login(request, **kwargs)

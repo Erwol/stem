@@ -133,7 +133,7 @@ STATICFILES_DIRS = (BASE_DIR, 'static')
 
 AUTH_USER_MODEL = "user.User"
 
-LOGIN_URL = "user:login"
-LOGIN_REDIRECT_URL = "game:index"
-LOGOUT_URL = "game:logout"
+LOGIN_URL = "user:index"
+# LOGIN_REDIRECT_URL = "game:home"
+LOGOUT_URL = "user:logout"
 
