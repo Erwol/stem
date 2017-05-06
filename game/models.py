@@ -51,6 +51,7 @@ class Game(Base):
     is_finished = models.BooleanField(_("¿Ha terminado el juego?"), default=False)
     actual_question = models.IntegerField(_("Pregunta actual, desde 1 hasta num pregs"), editable=False, default=0)
 
+
     class Meta:
         verbose_name = "Partida"
         verbose_name_plural = "Partidas"
@@ -106,13 +107,25 @@ class Question(Base):
     def __str__(self):
         return ("%d@%s") % (self.order, self.story.name)
 
+
+
+class AnswerManager(models.Manager):
+    def create_answer(self, game, question, points = 0, answer = ""):
+        answer = self.create(game=game, question=question, points=points, answer=answer)
+        # do something with the book
+        return answer
+
+
+
 class UserAnswer(Base):
     game = models.ForeignKey(Game) # Llegamos al usuario por aquí
     question = models.ForeignKey(Question)
 
     # Se van restando puntos según lo que haga el usuario
-    points = models.IntegerField(editable=False, validators=[MinValueValidator(0)])
-    answer = models.CharField(max_length=512, editable=False)
+    points = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)])
+    answer = models.CharField(max_length=512)
+
+    objects = AnswerManager()
 
 
 @receiver(post_save, sender=Question)
@@ -169,10 +182,11 @@ class TestOption(Base):
     """ Opciones a responder en una pregunta de tipo test """
     question = models.ForeignKey(Question, blank=False, null=False)
     is_active = models.BooleanField(_("¿Quiere que esta opción sea visible?"), default=True)
-    is_answer = models.BooleanField(_("Solución a la pregunta tipo test (puede haber varias)"), default=False)
+    is_answer = models.BooleanField(_("¿Es esta la solución? (debe ser única)"), default=False)
     text = models.CharField(_("Opción de pregunta tipo test"), max_length=512)
 
     class Meta:
+        unique_together = ('question', 'is_answer', )
         verbose_name = _("Opción a responder en pregunta de tipo test")
         verbose_name_plural = _("Opciones a responder en pregunta de tipo test")
 

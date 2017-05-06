@@ -5,6 +5,8 @@ from django.contrib.auth.views import login
 from django.views.generic import FormView, ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.shortcuts import render, redirect, get_object_or_404
 from game.models import *
+from django.views.decorators.http import require_http_methods
+
 
 class GameListView(LoginRequiredMixin, ListView):
     model = Game
@@ -42,30 +44,27 @@ class GameQuestionListView(LoginRequiredMixin, ListView):
 
 
 # Inicializa y recupera previas partidas del juego
+@require_http_methods(["POST"])
 def play_game(request, game_id):
-    # Comprobamos método de acceso a la función
-    if(request.method == "POST"):
-        game_id = request.POST.get("game_id", )
-        # TODO Comprobar si la partida existe realmente y está asociada a este usuario
-        game = get_object_or_404(Game, pk=game_id)
-        story = game.story
+    game_id = request.POST.get("game_id", )
+    # TODO Comprobar si la partida existe realmente y está asociada a este usuario
+    game = get_object_or_404(Game, pk=game_id)
+    story = game.story
 
-        if(story.questions_number == 0):
-            return HttpResponseRedirect(reverse('game:home', )) # TODO Devolver errores
+    if(story.questions_number == 0):
+        return HttpResponseRedirect(reverse('game:home', )) # TODO Devolver errores
 
-        request.session["game_id"] = game.id
-        request.session["story_id"] = story.id
-        request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
+    request.session["game_id"] = game.id
+    request.session["story_id"] = story.id
+    request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
 
-        return redirect('game:game-controller')
-        # return redirect('view', var1=value1)
-
-
-    else:
-        return HttpResponseRedirect(reverse('game:home',))
+    return redirect('game:game-controller')
+    # return redirect('view', var1=value1)
 
 
 
+
+@require_http_methods(["POST", "GET"])
 def game_controller(request):
     """ Controla la ejecución secuencial de las preguntas """
     # El juego termina cuando la pregunta actual es igual al número total de preguntas
@@ -75,6 +74,9 @@ def game_controller(request):
     story = get_object_or_404(Story, pk=story_id)
     # Accedemos a la pregunta que le toca al usuario
     question = Question.objects.filter(story=story).order_by('order')[actual_question]
+
+    # Guardamos el id de la pregunta actual (necesario para enlazar la respuesta)
+    request.session["actual_question_id"] = question.id
 
     # Si la pregunta es de tipo test, pasamos el cuestionario
     answers = list()
@@ -92,14 +94,50 @@ def game_controller(request):
 
 
 # Control del guardado de respuestas
+@require_http_methods(["POST"])
 def save_response(request):
     """ Sólo se guarda la respuesta y se avanza en la pregunta si el usuario la ha respondido """
 
     actual_question = request.session["actual_question"]
     story_id = request.session["story_id"]
     game_id = request.session["game_id"]
+    actual_question_id = request.session["actual_question_id"]
+
+    question = get_object_or_404(Question, pk=actual_question_id)
     story = get_object_or_404(Story, pk=story_id)
     game = get_object_or_404(Game, pk=game_id)
+
+
+    # Enlazamos respuesta del usuario y calculamos puntos sólo si la pregunta anterior no era una viñeta
+    if question.type != "VINETA":
+        post_answer = request.POST.get("answer", )
+        points = 0
+        real_answer = ""
+
+        # Buscamos la respuesta real
+        if question.type == "TEXTO":
+            # answer = get_object_or_404(TextQuestionAnswer, question=question)
+            if TextQuestionAnswer.objects.get(question=question):
+                answer = TextQuestionAnswer.objects.get(question=question)
+                real_answer = answer.answer.lower()
+            else:
+                print("¡Pregunta de texto sin solución!")
+
+        if question.type == "CUESTIONARIO":
+            if TestOption.objects.filter(question=question, is_answer=True):
+                answer = TestOption.objects.filter(question=question, is_answer=True).first()
+                real_answer = str(answer.id)
+
+            else:
+                print("Respuesta tipo test sin definir!")
+
+        print(str(real_answer) + " vs " + str(post_answer))
+        if real_answer == post_answer:
+            points = question.points
+        else:
+            points = 0
+        print(str(points) + " ganados!")
+        UserAnswer.objects.create_answer(game=game, question=question, answer=post_answer, points=points)
 
     actual_question += 1
     request.session["actual_question"] = actual_question
@@ -117,14 +155,29 @@ def save_response(request):
     return HttpResponseRedirect(reverse('game:game-controller', ))
 
 
+@require_http_methods(["GET"])
 def get_cheat(request, question_id, cheat_count):
-    if(request.method == "GET"):
-        question = get_object_or_404(Question, pk=question_id)
-        if Cheat.objects.filter(question=question)[int(cheat_count)]:
-            # TODO Quitar 1 punto de la pregunta por pista pedida
-            cheat = Cheat.objects.filter(question=question)[int(cheat_count)]
-            return HttpResponse(cheat.text, status=200)
-        else:
-            return HttpResponse(status=404)
+    question = get_object_or_404(Question, pk=question_id)
+    if Cheat.objects.filter(question=question)[int(cheat_count)]:
+        # TODO Quitar 1 punto de la pregunta por pista pedida
+        cheat = Cheat.objects.filter(question=question)[int(cheat_count)]
+        return HttpResponse(cheat.text, status=200)
     else:
-        return HttpResponseNotAllowed()
+        return HttpResponse(status=404)
+
+
+# Obtiene la puntuación de un juego ya acabado
+@require_http_methods(["GET"])
+def get_game_points(request, game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    if UserAnswer.objects.filter(game=game):
+        answers = UserAnswer.objects.filter(game=game)
+        questions_number = game.story.questions_number
+        sum = 0
+
+        for answer in answers:
+            sum += answer.points
+        sum = sum / questions_number
+        return HttpResponse(sum, status=200) # Devuelve la media de puntuaciones de esta partida en concreto
+    else:
+        return HttpResponse(status=404)

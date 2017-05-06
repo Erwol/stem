@@ -3,8 +3,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import GameCreateView, GameDeleteView, GameListView, GameQuestionListView, play_game, game_controller, save_response, get_cheat
-
+from .views import *
 # Necesario para las llamadas via POST
 app_name = 'game'
 
@@ -18,7 +17,12 @@ urlpatterns = [
     url(r'^play-game/(?P<game_id>[0-9]+)/$', play_game, name='play-game'),
     url(r'^game-controller/$', game_controller, name='game-controller'),
     url(r'^save-response/$', save_response, name='save-response'),
-    url(r'^question-cheat/(?P<question_id>[0-9]+)/(?P<cheat_count>[0-9]+)/$', get_cheat, name='save-response'),
+
+    # Devuelve el texto de la pista
+    url(r'^question-cheat/(?P<question_id>[0-9]+)/(?P<cheat_count>[0-9]+)/$', get_cheat, name='get-cheat'),
+
+    # Devuelve la media de puntos obtenidos en esta partida
+    url(r'^game-points/(?P<game_id>[0-9]+)/$', get_game_points, name='get-game-points'),
 
 
 ]

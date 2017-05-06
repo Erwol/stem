@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, TestOption, TextQuestionAnswer, Cheat, Story
+from .models import Question, TestOption, TextQuestionAnswer, Cheat, Story, UserAnswer
 # Register your models here.
 
 class CheatInline(admin.StackedInline):
@@ -25,6 +25,6 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 
-
+admin.site.register(UserAnswer)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Story)

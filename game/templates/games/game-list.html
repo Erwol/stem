@@ -1,6 +1,34 @@
 {% extends "base.html" %}
 
 {% block contenido %}
+
+<script>
+
+    function getGamePoints(game_id) {
+        var request = new XMLHttpRequest();
+        request.open('GET', '/game-points/' + game_id, true);
+
+        request.onload = function() {
+
+            if (request.status >= 200 && request.status < 400) {
+                var resp = request.responseText;
+                // game_id también es el elemento
+                document.getElementById(game_id).innerText = resp + " de 10 puntos obtenidos.";
+            } else {
+                console.log("Error con el servidor");
+            }
+        };
+
+        request.onerror = function() {
+        // There was a connection error of some sort
+        };
+
+        request.send();
+    }
+
+
+
+</script>
     <table>
         <thead>
         <tr>
@@ -22,6 +50,8 @@
                 <td>
                     {% if game.is_finished %}
                         Terminado
+                        <span id="{{ game.id }}"></span>
+                        <script>getGamePoints("{{ game.id }}")</script>
                     {% elif game.actual_question > 0 %}
                         En progreso
                     {% else %}
@@ -51,4 +81,7 @@
     <a href="{% url 'game:game-create' %}">
         <span></span>Crear Partida
     </a>
+
+
+
 {% endblock %}
