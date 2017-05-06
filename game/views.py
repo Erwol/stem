@@ -83,6 +83,9 @@ def game_controller(request):
     if question.type == "CUESTIONARIO":
         answers = TestOption.objects.filter(question=question)
 
+    # Inicializamos el penalizador de preguntas a 0
+    request.session["penalty"] = 0
+
     # Y también enviamos el número de pistas que tiene la pregunta
     cheat_number = Cheat.objects.filter(question=question).count()
     return render(request, 'question/question.html', {
@@ -136,7 +139,10 @@ def save_response(request):
             points = question.points
         else:
             points = 0
-        print(str(points) + " ganados!")
+
+        # Restamos los puntos de penalización por haber usado (o no) las pistas y lo reseteamos
+        points -= request.session["penalty"]
+        request.session["penalty"] = 0
         UserAnswer.objects.create_answer(game=game, question=question, answer=post_answer, points=points)
 
     actual_question += 1
@@ -160,6 +166,8 @@ def get_cheat(request, question_id, cheat_count):
     question = get_object_or_404(Question, pk=question_id)
     if Cheat.objects.filter(question=question)[int(cheat_count)]:
         # TODO Quitar 1 punto de la pregunta por pista pedida
+
+        request.session["penalty"] += 1
         cheat = Cheat.objects.filter(question=question)[int(cheat_count)]
         return HttpResponse(cheat.text, status=200)
     else:
