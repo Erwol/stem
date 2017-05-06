@@ -53,7 +53,6 @@ def play_game(request, game_id):
         if(story.questions_number == 0):
             return HttpResponseRedirect(reverse('game:home', )) # TODO Devolver errores
 
-
         request.session["game_id"] = game.id
         request.session["story_id"] = story.id
         request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
@@ -95,11 +94,13 @@ def game_controller(request):
 # Control del guardado de respuestas
 def save_response(request):
     """ Sólo se guarda la respuesta y se avanza en la pregunta si el usuario la ha respondido """
+
     actual_question = request.session["actual_question"]
     story_id = request.session["story_id"]
     game_id = request.session["game_id"]
     story = get_object_or_404(Story, pk=story_id)
     game = get_object_or_404(Game, pk=game_id)
+
     actual_question += 1
     request.session["actual_question"] = actual_question
 
@@ -120,6 +121,7 @@ def get_cheat(request, question_id, cheat_count):
     if(request.method == "GET"):
         question = get_object_or_404(Question, pk=question_id)
         if Cheat.objects.filter(question=question)[int(cheat_count)]:
+            # TODO Quitar 1 punto de la pregunta por pista pedida
             cheat = Cheat.objects.filter(question=question)[int(cheat_count)]
             return HttpResponse(cheat.text, status=200)
         else:

@@ -3,7 +3,7 @@ from user.models import User, Base
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 
 
@@ -77,6 +77,7 @@ class Question(Base):
     """ Preguntas de la historia """
     story = models.ForeignKey(Story, help_text=_("Historia a la que pertenece la pregunta"), blank=False, null=False, )
     order = models.PositiveIntegerField(_("Orden de la pregunta en el juego"), validators=[MinValueValidator(1)])
+    points = models.IntegerField(_("Puntos que da la pregunta (0, 10)"), default=10, validators=[MinValueValidator(0), MaxValueValidator(10)])
 
     QUESTION_TYPES = (
         ('TEXTO', _('Texto')),
@@ -104,6 +105,15 @@ class Question(Base):
 
     def __str__(self):
         return ("%d@%s") % (self.order, self.story.name)
+
+class UserAnswer(Base):
+    game = models.ForeignKey(Game) # Llegamos al usuario por aquí
+    question = models.ForeignKey(Question)
+
+    # Se van restando puntos según lo que haga el usuario
+    points = models.IntegerField(editable=False, validators=[MinValueValidator(0)])
+    answer = models.CharField(max_length=512, editable=False)
+
 
 @receiver(post_save, sender=Question)
 def increase_story_questions_number(sender, instance=None, created=False, **kwargs):

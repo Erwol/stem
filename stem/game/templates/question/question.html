@@ -9,6 +9,7 @@
 {% endif %}
 
 {{ question.text }}
+
 <form action="{% url 'game:save-response' %}" method="post">
 {% csrf_token %}
     {% if question.type == "TEXTO" %}
@@ -29,22 +30,28 @@
         var cheat_count = 0;
         var cheat_number = "{{ cheat_number }}"; // Número de pistas máximo
         var question_id = "{{ question.id }}";
+
         document.getElementById("cheat").addEventListener("click", function () {
+            if (confirm("¡Usar pistas te restará puntos! ¿Quieres continuar?") == false) {
+                return;
+            }
             if(cheat_count >= cheat_number){
-                alert("No hay más pistas :D SUERTE PUTO");
+                alert("No hay más pistas :D");
                 return;
             }
             var request = new XMLHttpRequest();
             request.open('GET', '/question-cheat/' + question_id + '/' + cheat_count, true);
 
             request.onload = function() {
+
                 if (request.status >= 200 && request.status < 400) {
                     // Success!
                     var resp = request.responseText;
-                    alert("PISTA!!" + resp);
+                    alert("Pista número " + cheat_count + ": " + resp);
+                    console.log(cheat_count + ", " + question_id);
+                    cheat_count ++;
                 } else {
-                // We reached our target server, but it returned an error
-
+                    console.log("Error con el servidor");
                 }
             };
 
@@ -54,8 +61,7 @@
 
             request.send();
 
-            console.log(cheat_count + ", " + question_id);
-            cheat_count ++;
+
         });
 
 
