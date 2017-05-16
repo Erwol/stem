@@ -50,7 +50,7 @@ class Game(Base):
     story = models.ForeignKey(Story, help_text=_("Historia seleccionada por el jugador"))
     is_finished = models.BooleanField(_("¿Ha terminado el juego?"), default=False)
     actual_question = models.IntegerField(_("Pregunta actual, desde 1 hasta num pregs"), editable=False, default=0)
-
+    points = models.FloatField(blank=True, null=True, default=0)
 
     class Meta:
         verbose_name = "Partida"

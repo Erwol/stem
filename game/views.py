@@ -113,36 +113,43 @@ def save_response(request):
 
     # Enlazamos respuesta del usuario y calculamos puntos sólo si la pregunta anterior no era una viñeta
     if question.type != "VINETA":
-        post_answer = request.POST.get("answer", )
         points = 0
-        real_answer = ""
+        post_answer = ""
 
-        # Buscamos la respuesta real
-        if question.type == "TEXTO":
-            # answer = get_object_or_404(TextQuestionAnswer, question=question)
-            if TextQuestionAnswer.objects.get(question=question):
-                answer = TextQuestionAnswer.objects.get(question=question)
-                real_answer = answer.answer.lower()
-            else:
-                print("¡Pregunta de texto sin solución!")
-
-        if question.type == "CUESTIONARIO":
-            if TestOption.objects.filter(question=question, is_answer=True):
-                answer = TestOption.objects.filter(question=question, is_answer=True).first()
-                real_answer = str(answer.id)
-
-            else:
-                print("Respuesta tipo test sin definir!")
-
-        print(str(real_answer) + " vs " + str(post_answer))
-        if real_answer == post_answer:
-            points = question.points
-        else:
+        # Comprobamos que el usuario haya incluido una respuesta
+        # En caso negativo, la puntuación de la pregunta será cero
+        if request.POST.get("answer", ):
+            post_answer = request.POST.get("answer", )
             points = 0
+            real_answer = ""
 
-        # Restamos los puntos de penalización por haber usado (o no) las pistas y lo reseteamos
-        points -= request.session["penalty"]
-        request.session["penalty"] = 0
+            # Buscamos la respuesta real
+            if question.type == "TEXTO":
+                # answer = get_object_or_404(TextQuestionAnswer, question=question)
+                if TextQuestionAnswer.objects.get(question=question):
+                    answer = TextQuestionAnswer.objects.get(question=question)
+                    real_answer = answer.answer.lower()
+                else:
+                    print("¡Pregunta de texto sin solución!")
+
+            if question.type == "CUESTIONARIO":
+                if TestOption.objects.filter(question=question, is_answer=True):
+                    answer = TestOption.objects.filter(question=question, is_answer=True).first()
+                    real_answer = str(answer.id)
+
+                else:
+                    print("Respuesta tipo test sin definir!")
+
+            print(str(real_answer) + " vs " + str(post_answer))
+            if real_answer == post_answer:
+                points = question.points
+            else:
+                points = 0
+
+            # Restamos los puntos de penalización por haber usado (o no) las pistas y lo reseteamos
+            points -= request.session["penalty"]
+            request.session["penalty"] = 0
+
         UserAnswer.objects.create_answer(game=game, question=question, answer=post_answer, points=points)
 
     actual_question += 1
@@ -154,6 +161,7 @@ def save_response(request):
 
     if actual_question >= story.get_questions_number():
         # TODO Mandar al usuario a una pantalla en la que vea los resultados
+        game.points = get_game_points_view(game.id)
         game.is_finished = True # Guardando este valor, esta partida será guardada como completada, aunque en un futuro se alteren las preguntas del test
         game.save()
         return HttpResponseRedirect(reverse('game:home', ))
@@ -172,6 +180,22 @@ def get_cheat(request, question_id, cheat_count):
         return HttpResponse(cheat.text, status=200)
     else:
         return HttpResponse(status=404)
+
+
+
+def get_game_points_view(game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    if UserAnswer.objects.filter(game=game):
+        answers = UserAnswer.objects.filter(game=game)
+        questions_number = game.story.questions_number
+        sum = 0
+
+        for answer in answers:
+            sum += answer.points
+        sum = sum / questions_number
+        return sum  # Devuelve la media de puntuaciones de esta partida en concreto
+    else:
+        return 0
 
 
 # Obtiene la puntuación de un juego ya acabado

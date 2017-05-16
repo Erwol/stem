@@ -19,20 +19,20 @@
 {% csrf_token %}
     {% if question.type == "TEXTO" %}
         <div class="row centered">
-                <div class="row form-group"></div>
-                <div class="row form-group"></div>
-                <div class="row form-group">
-                    <input type="text" name="answer">
-                </div>
+            <div class="row form-group"></div>
+            <div class="row form-group"></div>
+            <div class="row form-group">
+                <input type="text" name="answer">
+            </div>
         </div>
     {% elif question.type == "CUESTIONARIO" %}
         {% for answer in answers %}
-                <div class="row">
-                    <div class="col-lg-6 col-lg-offset-2">
-                        <h2><input type="radio" name="answer" value="{{ answer.id }}">
-                        {{ answer.text }}</h2>
-                    </div>
+            <div class="row">
+                <div class="col-lg-6 col-lg-offset-2">
+                    <h2><input type="radio" name="answer" value="{{ answer.id }}">
+                    {{ answer.text }}</h2>
                 </div>
+            </div>
         {% endfor %}
     {% endif %}
     <input type="hidden" name="question_id" value="{{ question.id }}">
