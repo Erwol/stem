@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import datetime
 # Create your models here.
 
 
@@ -51,12 +52,17 @@ class Game(Base):
     is_finished = models.BooleanField(_("¿Ha terminado el juego?"), default=False)
     actual_question = models.IntegerField(_("Pregunta actual, desde 1 hasta num pregs"), editable=False, default=0)
     points = models.FloatField(blank=True, null=True, default=0)
+    start_date = models.DateTimeField(_("Fecha de creación"), auto_now_add=True)
+    end_date = models.DateTimeField(_("Fecha de modificación"), auto_now_add=True)
+
 
     class Meta:
         verbose_name = "Partida"
         verbose_name_plural = "Partidas"
+        ordering = ['-end_date']
 
-
+    def __str__(self):
+        return "Partida %d del usuario %s" % (self.id, self.user)
     def game_over(self):
         """ Determina si se han recorrido todas las preguntas del juego """
         return self.is_finished and self.is_started
@@ -79,7 +85,7 @@ class Question(Base):
     story = models.ForeignKey(Story, help_text=_("Historia a la que pertenece la pregunta"), blank=False, null=False, )
     order = models.PositiveIntegerField(_("Orden de la pregunta en el juego"), validators=[MinValueValidator(1)])
     points = models.IntegerField(_("Puntos que da la pregunta (0, 10)"), default=10, validators=[MinValueValidator(0), MaxValueValidator(10)])
-
+    attempts = models.IntegerField(_("Número de intentos permitidos en la pregunta"), help_text=_("El usuario podrá fallar tantas veces como este valor indique"), default=3, validators=[MinValueValidator(1)])
     QUESTION_TYPES = (
         ('TEXTO', _('Texto')),
         ('CUESTIONARIO', _('Cuestionario')),
@@ -112,7 +118,6 @@ class Question(Base):
 class AnswerManager(models.Manager):
     def create_answer(self, game, question, points = 0, answer = ""):
         answer = self.create(game=game, question=question, points=points, answer=answer)
-        # do something with the book
         return answer
 
 
@@ -125,7 +130,16 @@ class UserAnswer(Base):
     points = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(10)])
     answer = models.CharField(max_length=512)
 
+    # Intentos realizados. No se permitirá al usuario avanzar a la siguiente pregunta hasta que
+    # haya agotado todos los intentos
+    attempts_made = models.IntegerField(editable=False, default=0)
     objects = AnswerManager()
+
+    class Meta:
+        verbose_name = _("Respuesta")
+        verbose_name_plural = _("Respuestas")
+    def __str__(self):
+        return "Respuesta %d de la partida %d del usuario %s." % (self.id, self.game.id, self.game.user)
 
 
 @receiver(post_save, sender=Question)

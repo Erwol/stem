@@ -15,7 +15,7 @@
         </div>
     </div>
 
-<form action="{% url 'game:save-response' %}" method="post">
+<form id="form" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
 {% csrf_token %}
     {% if question.type == "TEXTO" %}
         <div class="row centered">
@@ -40,15 +40,33 @@
     <div class="row form-group"></div>
     <div class="row centered">
         <div class="col-lg-12">
-            <input type="submit" class="btn btn-success btn-lg" value="Siguiente" />
+            <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
         </div>
     </div>
 </form>
+
+<script>
+
+        function ValidateAttempts() {
+            // Comprobamos validez de la respuesta
+            return true;
+        }
+        /*
+        document.getElementById("form").addEventListener("submit", function () {
+            alert("try");
+           return false;
+        });*/
+</script>
+
+
 
 {% if cheat_number > 0 %}
     <button id="cheat">¡Dame pistas!</button>
 
     <script>
+        
+
+
         var cheat_count = 0;
         var cheat_number = "{{ cheat_number }}"; // Número de pistas máximo
         var question_id = "{{ question.id }}";

@@ -6,6 +6,7 @@ from django.views.generic import FormView, ListView, DetailView, CreateView, Del
 from django.shortcuts import render, redirect, get_object_or_404
 from game.models import *
 from django.views.decorators.http import require_http_methods
+from datetime import datetime
 
 
 class GameListView(LoginRequiredMixin, ListView):
@@ -86,6 +87,8 @@ def game_controller(request):
     # Inicializamos el penalizador de preguntas a 0
     request.session["penalty"] = 0
 
+
+
     # Y también enviamos el número de pistas que tiene la pregunta
     cheat_number = Cheat.objects.filter(question=question).count()
     return render(request, 'question/question.html', {
@@ -97,10 +100,10 @@ def game_controller(request):
 
 
 # Control del guardado de respuestas
+# El usuario llega aquí via post tras hacer click en "siguiente pregunta"
 @require_http_methods(["POST"])
 def save_response(request):
     """ Sólo se guarda la respuesta y se avanza en la pregunta si el usuario la ha respondido """
-
     actual_question = request.session["actual_question"]
     story_id = request.session["story_id"]
     game_id = request.session["game_id"]
@@ -110,14 +113,20 @@ def save_response(request):
     story = get_object_or_404(Story, pk=story_id)
     game = get_object_or_404(Game, pk=game_id)
 
+    # Aumentamos el número de intentos
+    request.session["attemps_made"] += 1
+    attemps = request.session["attemps_made"]
+    max_attemps = question.attempts
 
     # Enlazamos respuesta del usuario y calculamos puntos sólo si la pregunta anterior no era una viñeta
     if question.type != "VINETA":
+        print("NO VIÑETA")
         points = 0
         post_answer = ""
 
         # Comprobamos que el usuario haya incluido una respuesta
         # En caso negativo, la puntuación de la pregunta será cero
+
         if request.POST.get("answer", ):
             post_answer = request.POST.get("answer", )
             points = 0
@@ -128,7 +137,10 @@ def save_response(request):
                 # answer = get_object_or_404(TextQuestionAnswer, question=question)
                 if TextQuestionAnswer.objects.get(question=question):
                     answer = TextQuestionAnswer.objects.get(question=question)
+
+                    # Ponemos ambas, la respuesta del usuario y la original en minúsculas
                     real_answer = answer.answer.lower()
+                    post_answer = post_answer.lower()
                 else:
                     print("¡Pregunta de texto sin solución!")
 
@@ -141,6 +153,13 @@ def save_response(request):
                     print("Respuesta tipo test sin definir!")
 
             print(str(real_answer) + " vs " + str(post_answer))
+
+
+
+            # Comprobamos intentos
+            if attemps < max_attemps and real_answer != post_answer:
+                return HttpResponseRedirect(reverse('game:game-controller', ))
+
             if real_answer == post_answer:
                 points = question.points
             else:
@@ -150,7 +169,17 @@ def save_response(request):
             points -= request.session["penalty"]
             request.session["penalty"] = 0
 
+
+        else:
+            # Comprobamos el caso de que el usuario no hay introducido respuesta y le queden intentos
+            print("Intentos: " + str(attemps) + " Máximo: " + str(max_attemps))
+            if attemps < max_attemps:
+                return HttpResponseRedirect(reverse('game:game-controller', ))
+
         UserAnswer.objects.create_answer(game=game, question=question, answer=post_answer, points=points)
+
+
+
 
     actual_question += 1
     request.session["actual_question"] = actual_question
@@ -160,12 +189,17 @@ def save_response(request):
     game.save()
 
     if actual_question >= story.get_questions_number():
-        # TODO Mandar al usuario a una pantalla en la que vea los resultados
+
+        # Recopilamos los puntos obtenidos y marcamos variables del final del juego
         game.points = get_game_points_view(game.id)
         game.is_finished = True # Guardando este valor, esta partida será guardada como completada, aunque en un futuro se alteren las preguntas del test
+
+        game.end_date = datetime.now()
         game.save()
+
         return HttpResponseRedirect(reverse('game:home', ))
 
+    request.session["attemps_made"] = 0
     return HttpResponseRedirect(reverse('game:game-controller', ))
 
 
@@ -181,7 +215,10 @@ def get_cheat(request, question_id, cheat_count):
     else:
         return HttpResponse(status=404)
 
-
+# Función que comprueba si una respuesta es o no correcta en función a la historia y el tipo de pregunta
+@require_http_methods(["POST"])
+def check_simple_answer(request, answer_text):
+    pass
 
 def get_game_points_view(game_id):
     game = get_object_or_404(Game, pk=game_id)
