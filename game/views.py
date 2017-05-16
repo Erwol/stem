@@ -48,6 +48,7 @@ class GameQuestionListView(LoginRequiredMixin, ListView):
 @require_http_methods(["POST"])
 def play_game(request, game_id):
     game_id = request.POST.get("game_id", )
+
     # TODO Comprobar si la partida existe realmente y está asociada a este usuario
     game = get_object_or_404(Game, pk=game_id)
     story = game.story
@@ -59,8 +60,11 @@ def play_game(request, game_id):
     request.session["story_id"] = story.id
     request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
 
+    # Controlamos la primera ejecución del controlador
+    if not "attemps_made" in request.session:
+        request.session["attemps_made"] = 0
+
     return redirect('game:game-controller')
-    # return redirect('view', var1=value1)
 
 
 
@@ -72,7 +76,12 @@ def game_controller(request):
     actual_question = request.session["actual_question"]
     story_id = request.session["story_id"]
 
+    # Controlamos la primera ejecución del controlador
+    if not "attemps_made" in request.session:
+        request.session["attemps_made"] = 0
+
     story = get_object_or_404(Story, pk=story_id)
+
     # Accedemos a la pregunta que le toca al usuario
     question = Question.objects.filter(story=story).order_by('order')[actual_question]
 
@@ -87,10 +96,9 @@ def game_controller(request):
     # Inicializamos el penalizador de preguntas a 0
     request.session["penalty"] = 0
 
-
-
     # Y también enviamos el número de pistas que tiene la pregunta
     cheat_number = Cheat.objects.filter(question=question).count()
+
     return render(request, 'question/question.html', {
         'question': question,
         'answers': answers,
@@ -114,6 +122,8 @@ def save_response(request):
     game = get_object_or_404(Game, pk=game_id)
 
     # Aumentamos el número de intentos
+    if not "attemps_made" in request.session:
+        request.session["attemps_made"] = 0
     request.session["attemps_made"] += 1
     attemps = request.session["attemps_made"]
     max_attemps = question.attempts
