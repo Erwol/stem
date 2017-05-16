@@ -1,10 +1,29 @@
 {% extends "base.html" %}
 
+{% load bootstrap3 %}
+
 {% block contenido %}
-    <fieldset>
-        <form method="post">{% csrf_token %}
-            ¿Estás seguro que deseas borrar la partida {{ object.pk }}?
-        <input type="submit" value="Confirmar" />
-        </form>
-    </fieldset>
+    <div class="container">
+        <div class="row centered">
+            <fieldset>
+                <form method="post" class="form-horizontal" role="form">{% csrf_token %}
+                    <h1>¿Estás seguro que deseas borrar la partida {{ object.pk }}?</h1>
+                                  <div class="row form-group"></div>
+        <div class="row form-group"></div>
+                        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+                    <div class="row form-group"></div>
+                    <div class="row form-group"></div>
+        <div class="row centered">
+            <div class="col-md-4 col-md-offset-2">
+                <button type="submit" class="btn btn-success btn-lg" value="Confirmar"><strong>Sí</strong></button>
+            </div>
+            <div class="col-md-1 col-md-offset-1">
+                <a class="btn btn-danger btn-lg" href="{% url 'game:home' %}"><b><strong>No</strong></b></a>
+            </div>
+        </div>
+                </form>
+            </fieldset>
+        </div>
+    </div>
 {% endblock %}

@@ -1,9 +1,28 @@
 {% extends "base.html" %}
+{% load bootstrap3 %}
 
 {% block contenido %}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit" />
-</form>
+    <div class="container">
+        <div class="row centered">
+            <div class="col-lg-12">
+                <h1>¿Que aventura deseas comenzar?</h1>
+            </div>
+        </div>
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+        <div class="row centered">
+            <div class="col-lg-3">
+            </div>
+            <div class="col-lg-8">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% bootstrap_field form.story field_class="col-md-3" show_help=False show_label=False layout="horizontal" size="small"  %}
+                        <input type="submit" class="btn btn-success btn-md" value="Crear aventura" />
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

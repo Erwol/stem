@@ -1,87 +1,79 @@
 {% extends "base.html" %}
 
 {% block contenido %}
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{% url 'game:home' %}"><b>TORCUATO JONES</b></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'user:logout' %}">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
 
-<script>
-
-    function getGamePoints(game_id) {
-        var request = new XMLHttpRequest();
-        request.open('GET', '/game-points/' + game_id, true);
-
-        request.onload = function() {
-
-            if (request.status >= 200 && request.status < 400) {
-                var resp = request.responseText;
-                // game_id también es el elemento
-                document.getElementById(game_id).innerText = resp + " de 10 puntos obtenidos.";
-            } else {
-                console.log("Error con el servidor");
-            }
-        };
-
-        request.onerror = function() {
-        // There was a connection error of some sort
-        };
-
-        request.send();
-    }
-
-
-
-</script>
-    <table>
-        <thead>
-        <tr>
-            <th>Partida</th>
-            <th>Historia</th>
-            <th>Estado</th>
-            <th>Acción</th>
-        </tr>
-        </thead>
-        <tbody>
+    <div class="container">
+        <div class="row centered">
+            <div class="col-lg-3">
+                <h1><strong>Partida</strong></h1>
+            </div>
+            <div class="col-lg-3">
+                <h1><strong>Historia</strong></h1>
+            </div>
+            <div class="col-lg-3">
+                <h1><strong>Estado</strong></h1>
+            </div>
+            <div class="col-lg-3">
+                <h1><strong>Acción</strong></h1>
+            </div>
+        </div>
         {% for game in object_list %}
-            <tr>
-                <td>
-                    {{ game.id }}
-                </td>
-                <td>
-                    {{ game.story.name }}
-                </td>
-                <td>
+            <div class="row centered">
+                <div class="col-lg-3">
+                    <h3>{{ game.id }}</h3>
+                </div>
+                <div class="col-lg-3">
+                    <h3>{{ game.story.name }}</h3>
+                </div>
+                <div class="col-lg-3">
                     {% if game.is_finished %}
-                        Terminado
-                        <span id="{{ game.id }}"></span>
-                        <script>getGamePoints("{{ game.id }}")</script>
+                        <h3>Terminado</h3>
                     {% elif game.actual_question > 0 %}
-                        En progreso
+                        <h3>En progreso</h3>
                     {% else %}
-                        Sin comenzar
+                        <h3>Sin comenzar</h3>
                     {% endif %}
-
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row form-group"></div>
                     {% if not game.is_finished %}
                         <form action="{% url 'game:play-game' game.id %}" method="post">
-                        {% csrf_token %}
+                            {% csrf_token %}
                             <input type="hidden" name="game_id" value="{{ game.id }}">
                             {% if game.actual_question > 0 %}
-                                <input type="submit" value="Continuar la aventura" />
+                                <input type="submit" class="btn btn-info btn-xs" value="Continuar la aventura" />
                             {% else %}
-                                <input type="submit" value="Comenzar la aventura" />
+                                <input type="submit" class="btn btn-info btn-xs" value="Comenzar la aventura" />
                             {% endif %}
+                            <a class="btn btn-danger btn-sm" href="{% url 'game:game-delete' pk=game.id %}">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </a>
                         </form>
                     {% endif %}
+                    </div>
+            </div>
 
-                    <a href="{% url 'game:game-delete' pk=game.id %}">
-                        <span></span>Borrar
-                    </a>
-                </td>
-            </tr>
         {% endfor %}
-        </tbody>
-    </table>
-    <a href="{% url 'game:game-create' %}">
-        <span></span>Crear Partida
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+        <div class="row centered">
+           <a class="btn btn-primary btn-lg" href="{% url 'game:game-create' %}">
+        Nueva Partida
     </a>
-
-
-
+        </div>
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+    </div>
 {% endblock %}

@@ -1,2 +1,33 @@
+{% load staticfiles %}
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Torcuato Jones</title>
+    <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/main.css' %}">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+  </head>
+
+  <div id="headerwrap">
+
 {% block contenido %}
 {% endblock %}
+
+  </div><!-- /headerwrap -->
+
+	<div class="container">
+		<hr>
+		<p class="centered">Creado por José Manuel Vázquez Crespo, Ernesto Wulff Olea, Juan José García Beza, José Álvaro Gutierrez Romero, Julián Rodríguez Cárave y David Blanco Fuentes</p>
+	</div><!-- /container -->
+	<div class="container">
+		<p class="centered">TORCUATO JONES - PINF - 2017</p>
+	</div><!-- /container -->
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
