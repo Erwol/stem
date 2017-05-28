@@ -25,8 +25,12 @@ class GameCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('game:home')
 
     def form_valid(self, form):
+        """
+        Tras escoger el juego, comenzamos el mismo. Obtenemos su id desde form.instance.story ...
+        """
         form.instance.user = self.request.user
-        return super(GameCreateView, self).form_valid(form)
+        super(GameCreateView, self).form_valid(form)
+        return HttpResponseRedirect(reverse('game:play-game', kwargs={'game_id': form.instance.id}))
 
 class GameDeleteView(LoginRequiredMixin, DeleteView):
     model = Game
@@ -42,13 +46,16 @@ class GameQuestionListView(LoginRequiredMixin, ListView):
         return Question.objects.filter(story__in=
            Game.objects.filter(pk__in=self.kwargs['pk']).values('story'))
 
+class RankingListView(LoginRequiredMixin, ListView):
+    model = Game
+    template_name = "games/ranking-list.html"
+    login_url = 'login'
+    queryset = Game.objects.all().order_by('-points')
 
 
 # Inicializa y recupera previas partidas del juego
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "GET"])
 def play_game(request, game_id):
-    game_id = request.POST.get("game_id", )
-
     # TODO Comprobar si la partida existe realmente y está asociada a este usuario
     game = get_object_or_404(Game, pk=game_id)
     story = game.story
@@ -59,10 +66,7 @@ def play_game(request, game_id):
     request.session["game_id"] = game.id
     request.session["story_id"] = story.id
     request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
-
-    # Controlamos la primera ejecución del controlador
-    if not "attemps_made" in request.session:
-        request.session["attemps_made"] = 0
+    request.session['attemps_made'] = 0
 
     return redirect('game:game-controller')
 
@@ -76,12 +80,7 @@ def game_controller(request):
     actual_question = request.session["actual_question"]
     story_id = request.session["story_id"]
 
-    # Controlamos la primera ejecución del controlador
-    if not "attemps_made" in request.session:
-        request.session["attemps_made"] = 0
-
     story = get_object_or_404(Story, pk=story_id)
-
     # Accedemos a la pregunta que le toca al usuario
     question = Question.objects.filter(story=story).order_by('order')[actual_question]
 
@@ -96,9 +95,10 @@ def game_controller(request):
     # Inicializamos el penalizador de preguntas a 0
     request.session["penalty"] = 0
 
+
+
     # Y también enviamos el número de pistas que tiene la pregunta
     cheat_number = Cheat.objects.filter(question=question).count()
-
     return render(request, 'question/question.html', {
         'question': question,
         'answers': answers,
@@ -122,15 +122,12 @@ def save_response(request):
     game = get_object_or_404(Game, pk=game_id)
 
     # Aumentamos el número de intentos
-    if not "attemps_made" in request.session:
-        request.session["attemps_made"] = 0
-    request.session["attemps_made"] += 1
-    attemps = request.session["attemps_made"]
+    request.session['attemps_made'] += 1
+    attemps = request.session['attemps_made']
     max_attemps = question.attempts
 
     # Enlazamos respuesta del usuario y calculamos puntos sólo si la pregunta anterior no era una viñeta
     if question.type != "VINETA":
-        print("NO VIÑETA")
         points = 0
         post_answer = ""
 
@@ -162,8 +159,6 @@ def save_response(request):
                 else:
                     print("Respuesta tipo test sin definir!")
 
-            print(str(real_answer) + " vs " + str(post_answer))
-
 
 
             # Comprobamos intentos
@@ -181,8 +176,6 @@ def save_response(request):
 
 
         else:
-            # Comprobamos el caso de que el usuario no hay introducido respuesta y le queden intentos
-            print("Intentos: " + str(attemps) + " Máximo: " + str(max_attemps))
             if attemps < max_attemps:
                 return HttpResponseRedirect(reverse('game:game-controller', ))
 

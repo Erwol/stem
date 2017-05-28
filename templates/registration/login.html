@@ -2,6 +2,7 @@
 {% load bootstrap3 %}
 
 {% block contenido %}
+<!--
 		<div class="navbar navbar-default navbar-fixed-top">
 		  <div class="container">
 			<div class="navbar-header">
@@ -11,29 +12,35 @@
 			  <ul class="nav navbar-nav navbar-right">
 				<li><a href="{% url 'user:signup' %}">Sign up</a></li>
 			  </ul>
-			</div><!--/.nav-collapse -->
+			</div>
 		  </div>
 		</div>
 
+-->
+
 		<div class="container">
 			<div class="row centered">
-				<div class="col-lg-6">
-                  <h1><strong>TORCUATO JONES</strong></h1>
-					<h1>Login</h1>
-					<form method="post" class="form-horizontal" role="form">
-					  <div class="form-group">
-					        {% csrf_token %}
-                            {% bootstrap_field form.username field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
-                            {% bootstrap_field form.password field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
-                        <button type="submit" class="btn btn-warning btn-lg">Entrar</button>
-					  </div>
-					</form>
-				</div><!-- /col-lg-6 -->
-				<div class="col-lg-6">
-					<img class="img-responsive" src="static/assets/img/ipad-hand.png" alt="">
-				</div><!-- /col-lg-6 -->
+			<div class="col-xs-12 col-md-6">
+				<h1><strong>TORCUATO JONES</strong></h1>
+				<h1>Acceder</h1>
+				<form method="post" class="form-horizontal" role="form">
+                <div class="col-xs-push-6 col-md-push-3">
+                    <div class="center-block form-group">
+					{% csrf_token %}
+					{% bootstrap_field form.username field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
+					{% bootstrap_field form.password field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
+					<button type="submit" class="btn btn-warning btn-lg">Entrar</button>
+				</div>
 
-			</div><!-- /row -->
-		</div><!-- /container -->
+                </div>
+
+				</form>
+			</div>
+			<div class="col-lg-6">
+				<img class="img-responsive" src="static/assets/img/ipad-hand.png" alt="">
+			</div>
+
+			</div>
+		</div>
 
 {% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          </button>
+          <a class="navbar-brand" href="{% url 'game:home' %}"><b>INICIO</b></a>
+            <a class="navbar-brand" href="{% url 'game:ranking-list' %}"><b>RANKING</b></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'user:logout' %}">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+        <div class="row centered">
+            <div class="col-lg-4">
+                <h1><strong>Usuario</strong></h1>
+            </div>
+            <div class="col-lg-4">
+                <h1><strong>Historia</strong></h1>
+            </div>
+            <div class="col-lg-4">
+                <h1><strong>Puntuación</strong></h1>
+            </div>
+        </div>
+        {% for game in object_list %}
+        {% if game.is_finished %}
+            <div class="row centered">
+                    <div class="col-lg-4">
+                        <h3>{{ game.user.username }}</h3>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>{{ game.story.name }}</h3>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>Puntuación: {{ game.points }}</h3>
+                    </div>
+            </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+{% endblock %}

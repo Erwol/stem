@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block contenido %}
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          </button>
+          <a class="navbar-brand" href="{% url 'game:home' %}"><b>INICIO</b></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'user:signup' %}">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+		<div class="container">
+			<div class="row centered">
+				<div class="col-lg-6">
+                  <h1><strong>TORCUATO JONES</strong></h1>
+					<h1>Login</h1>
+					<form method="post" class="form-horizontal" role="form">
+					  <div class="form-group">
+					        {% csrf_token %}
+                            {% bootstrap_field form.username field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
+                            {% bootstrap_field form.password field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
+                        <button type="submit" class="btn btn-warning btn-lg">Entrar</button>
+					  </div>
+					</form>
+				</div><!-- /col-lg-6 -->
+				<div class="col-lg-6">
+					<img class="img-responsive" src="static/assets/img/ipad-hand.png" alt="">
+				</div><!-- /col-lg-6 -->
+
+			</div><!-- /row -->
+		</div><!-- /container -->
+
+{% endblock %}

@@ -1,112 +1,120 @@
 {% extends "base.html" %}
 
 {% block contenido %}
-
-{# Just a simple question #}
 <div class="container">
-    <div class="row centered">
-        <div class="col-lg-12">
+    <div class="row">
+        <div class="col-lg-6">
             {% if question.image %}
-                <img src="{{ question.image.url }}" class="img-thumbnail" height="900" width="800">
+            <img src="{{ question.image.url }}" class="img-thumbnail" height="600" width="500">
             {% endif %}
-            </div>
-        <div class="col-lg-12">
-            <h2><strong>{{ question.text }}</strong></h2>
         </div>
-    </div>
+        {% if question.image %}
+        <div class="col-lg-6 centered">
+            {% endif %}
+            {% if not question.image %}
+            <div class="col-lg-12 centered">
+                {% endif %}
+                <h2><strong>{{ question.text }}</strong></h2>
+            </div>
 
-<form id="form" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
-{% csrf_token %}
-    {% if question.type == "TEXTO" %}
-        <div class="row centered">
+            <form id="form" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
+                {% csrf_token %}
+                {% if question.type == "TEXTO" %}
+                {% if question.image %}
+                <div class="col-lg-6">
+                    {% endif %}
+                    {% if not question.image %}
+                    <div class="col-lg-12">
+                        {% endif %}
+                        <div class="row form-group"></div>
+                        <div class="row form-group"></div>
+                        <div class="input-group centered">
+                            <input type="text" class="form-control" placeholder="Respuesta" name="answer">
+                        </div>
+                        <div class="row form-group"></div>
+                        <div class="row form-group"></div>
+                    </div>
+                    {% elif question.type == "CUESTIONARIO" %}
+                    {% for answer in answers %}
+                    <fieldset class="form-group">
+                        <div class="form-check col-lg-3">
+                            <label class="form-check-label">
+                                <h2><input class="form-check-input" type="radio" name="answer" value="{{ answer.id }}">
+                                    {{ answer.text }}</h2>
+                            </label>
+                        </div>
+                    </fieldset>
+                    {% endfor %}
+                    {% endif %}
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    <div class="col-lg-1">
+                        <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
+                    </div>
+            </form>
             <div class="row form-group"></div>
             <div class="row form-group"></div>
-            <div class="row form-group">
-                <input type="text" name="answer">
-            </div>
         </div>
-    {% elif question.type == "CUESTIONARIO" %}
-        {% for answer in answers %}
-            <div class="row">
-                <div class="col-lg-6 col-lg-offset-2">
-                    <h2><input type="radio" name="answer" value="{{ answer.id }}">
-                    {{ answer.text }}</h2>
+
+
+        {% if cheat_number > 0 %}
+        <div class="row">
+            {% if question.image %}
+            <div class="col-lg-5 centered">
+                {% endif %}
+                {% if not question.image %}
+                <div class="col-lg-1 centered">
+                    {% endif %}
+                    <a class="btn btn-default btn-sm" id="cheat">¡Dame pistas!</a>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
-    <input type="hidden" name="question_id" value="{{ question.id }}">
-    <div class="row form-group"></div>
-    <div class="row form-group"></div>
-    <div class="row centered">
-        <div class="col-lg-12">
-            <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
         </div>
-    </div>
-</form>
-
-<script>
-
-        function ValidateAttempts() {
-            // Comprobamos validez de la respuesta
-            return true;
-        }
-        /*
-        document.getElementById("form").addEventListener("submit", function () {
-            alert("try");
-           return false;
-        });*/
-</script>
+            <script>
 
 
+                var cheat_count = 0;
+                var cheat_number = "{{ cheat_number }}"; // Número de pistas máximo
+                var question_id = "{{ question.id }}";
 
-{% if cheat_number > 0 %}
+                document.getElementById("cheat").addEventListener("click", function () {
+                    if (confirm("¡Usar pistas te restará puntos! ¿Quieres continuar?") == false) {
+                        return;
+                    }
+                    if (cheat_count >= cheat_number) {
+                        alert("No hay más pistas disponibles, ¡ya deberias saberlo!");
+                        return;
+                    }
+                    var request = new XMLHttpRequest();
+                    request.open('GET', '/question-cheat/' + question_id + '/' + cheat_count, true);
 
-    <button id="cheat">¡Dame pistas!</button>
+                    request.onload = function () {
 
-    <script>
-        var cheat_count = 0;
-        var cheat_number = "{{ cheat_number }}"; // Número de pistas máximo
-        var question_id = "{{ question.id }}";
+                        if (request.status >= 200 && request.status < 400) {
+                            // Success!
+                            var resp = request.responseText;
+                            alert("Pista: " + resp);
+                            console.log(cheat_count + ", " + question_id);
+                            cheat_count++;
+                        } else {
+                            console.log("Error con el servidor");
+                        }
+                    };
 
-        document.getElementById("cheat").addEventListener("click", function () {
-            if (confirm("¡Usar pistas te restará puntos! ¿Quieres continuar?") == false) {
-                return;
-            }
-            if(cheat_count >= cheat_number){
-                alert("No hay más pistas :D");
-                return;
-            }
-            var request = new XMLHttpRequest();
-            request.open('GET', '/question-cheat/' + question_id + '/' + cheat_count, true);
+                    request.onerror = function () {
+                        // There was a connection error of some sort
+                    };
 
-            request.onload = function() {
-
-                if (request.status >= 200 && request.status < 400) {
-                    // Success!
-                    var resp = request.responseText;
-                    alert("Pista número " + cheat_count + ": " + resp);
-                    console.log(cheat_count + ", " + question_id);
-                    cheat_count ++;
-                } else {
-                    console.log("Error con el servidor");
-                }
-            };
-
-            request.onerror = function() {
-            // There was a connection error of some sort
-            };
-
-            request.send();
+                    request.send();
 
 
-        });
+                });
 
 
+            </script>
+            {% endif %}
 
-    </script>
-{% endif %}
-</div>
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
+        <div class="row form-group"></div>
 
 
-{% endblock %}
+        {% endblock %}

@@ -1,21 +1,51 @@
 {% extends "base.html" %}
 
 {% block contenido %}
+<div style="padding-bottom: 35%;">
     <div class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="{% url 'game:home' %}"><b>TORCUATO JONES</b></a>
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                </button>
+                <a class="navbar-brand" href="{% url 'game:home' %}"><b>INICIO</b></a>
+                <a class="navbar-brand" href="{% url 'game:ranking-list' %}"><b>RANKING</b></a>
+            </div>
         </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'user:logout' %}">Logout</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
     </div>
 
-    <div class="container">
-        <div class="row centered">
+    <div class="container col-md-push-4 col-xs-6 col-sm-4">
+        <h1 class="centered">
+            ¡Hola, {{ user }}!
+        </h1>
+        <h2 class="centered">¿Qué quieres hacer?</h2>
+
+        <div class="container col-lg-push-3 col-sm-6">
+            <div class="row centered" style="padding-top: 5%;">
+                <a class="btn btn-success btn-lg btn-block" href="{% url 'game:game-create' %}">
+                    Comenzar partida
+                </a>
+            </div>
+            <div class="row centered" style="padding-top: 5%;">
+                <a class="btn btn-warning btn-lg btn-block" href="{% url 'game:game-create' %}">
+                    Continuar partida
+                </a>
+            </div>
+            <div class="row centered" style="padding-top: 5%;">
+                <a class="btn btn-default btn-lg btn-block" href="{% url 'game:game-create' %}">
+                    Mis puntuaciones
+                </a>
+            </div>
+            <div class="row centered" style="padding-top: 5%;">
+                <a class="btn btn-danger btn-lg btn-block" href="{% url 'user:logout' %}">
+                    Salir
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container col-md-push-4 col-xs-6 col-sm-4">
+        <div >
             <div class="col-lg-3">
                 <h1><strong>Partida</strong></h1>
             </div>
@@ -30,53 +60,52 @@
             </div>
         </div>
         {% for game in object_list %}
-            <div class="row centered">
-                <div class="col-lg-3">
-                    <h3>{{ game.id }}</h3>
-                </div>
-                <div class="col-lg-3">
-                    <h3>{{ game.story.name }}</h3>
-                </div>
-                <div class="col-lg-3">
-                    {% if game.is_finished %}
-                        <h3>Terminado</h3>
-                    {% elif game.actual_question > 0 %}
-                        <h3>En progreso</h3>
-                    {% else %}
-                        <h3>Sin comenzar</h3>
-                    {% endif %}
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="row form-group"></div>
-                    {% if not game.is_finished %}
-                        <form action="{% url 'game:play-game' game.id %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="game_id" value="{{ game.id }}">
-                            {% if game.actual_question > 0 %}
-                                <input type="submit" class="btn btn-info btn-xs" value="Continuar la aventura" />
-                            {% else %}
-                                <input type="submit" class="btn btn-info btn-xs" value="Comenzar la aventura" />
-                            {% endif %}
-                            <a class="btn btn-danger btn-sm" href="{% url 'game:game-delete' pk=game.id %}">
-                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            </a>
-                        </form>
-                    {% else %}
-                        <h3>Puntuación: {{ game.points }}</h3>
-                    {% endif %}
-                    </div>
+        <div>
+            <div class="col-lg-3">
+                <h3>{{ game.id }}</h3>
             </div>
+            <div class="col-lg-3">
+                <h3>{{ game.story.name }}</h3>
+            </div>
+            <div class="col-lg-3">
+                {% if game.is_finished %}
+                <h3>Terminado</h3>
+                {% elif game.actual_question > 0 %}
+                <h3>En progreso</h3>
+                {% else %}
+                <h3>Sin comenzar</h3>
+                {% endif %}
+            </div>
+            <div class="col-lg-3">
+                <div class="row form-group"></div>
+                {% if not game.is_finished %}
+                <form action="{% url 'game:play-game' game.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    {% if game.actual_question > 0 %}
+                    <input type="submit" class="btn btn-info btn-xs" value="Continuar la aventura"/>
+                    {% else %}
+                    <input type="submit" class="btn btn-info btn-xs" value="Comenzar la aventura"/>
+                    {% endif %}
+                    <a class="btn btn-danger btn-sm" href="{% url 'game:game-delete' pk=game.id %}">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </a>
+                </form>
+                {% else %}
+                <h3>Puntuación: {{ game.points }}</h3>
+                {% endif %}
+            </div>
+        </div>
 
         {% endfor %}
-        <div class="row form-group"></div>
-        <div class="row form-group"></div>
-        <div class="row centered">
-           <a class="btn btn-primary btn-lg" href="{% url 'game:game-create' %}">
-        Nueva Partida
-    </a>
-        </div>
-        <div class="row form-group"></div>
-        <div class="row form-group"></div>
+
     </div>
+</div>
 
 {% endblock %}
+
+
+
+
+
+

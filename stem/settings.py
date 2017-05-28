@@ -39,9 +39,8 @@ INSTALLED_APPS = [
     'user',
     'game',
     'bootstrap3',
-	# Disable Django's own staticfiles handling in favour of WhiteNoise, for
-    # greater consistency between gunicorn and `./manage.py runserver`. See:
-    # http://whitenoise.evans.io/en/stable/django.html#using-whitenoise-in-development
+    'ckeditor',
+    #'ckeditor_uploader'
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 ]
@@ -163,7 +162,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-
+CKEDITOR_UPLOAD_PATH = MEDIA_URL
 
 
 # Update database configuration with $DATABASE_URL.

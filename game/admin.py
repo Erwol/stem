@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Question, TestOption, TextQuestionAnswer, Cheat, Story, UserAnswer, Game
-# Register your models here.
+from django import forms
+from ckeditor.widgets import CKEditorWidget
 
 class CheatInline(admin.StackedInline):
     model = Cheat
@@ -19,8 +20,16 @@ class TextQuestionAnswerInline(admin.StackedInline):
     max_num = 1
     classes = ('collapse',)
 
+
+
+class QuestionAdminForm(forms.ModelForm):
+    text = forms.CharField(widget=CKEditorWidget())
+    class Meta:
+        fields = ('__all__')
+        model = Question
 class QuestionAdmin(admin.ModelAdmin):
-    inlines = (CheatInline, TestOptionInline, TextQuestionAnswerInline, )
+    form = QuestionAdminForm
+    inlines = (CheatInline, TestOptionInline, TextQuestionAnswerInline,)
 
 
 

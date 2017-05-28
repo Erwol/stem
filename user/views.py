@@ -29,6 +29,7 @@ class UserCreateView(FormView):
     def form_valid(self, form):
         user = User.objects.create_user(
                 password=form.cleaned_data['password'],
-                username=form.cleaned_data['username']
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email']
         )
         return super(UserCreateView, self).form_valid(form)
