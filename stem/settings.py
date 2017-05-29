@@ -26,7 +26,7 @@ SECRET_KEY = 'j@ga-lfs(t7)r96wwqqilo%wx0e%vhi$f6z$rlj6g7q5anfb9h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://stem-uca.herokuapp.com', 'http://stem-uca.herokuapp.com']
+ALLOWED_HOSTS = ['.herokuapp.com']
 
 # Application definition
 
