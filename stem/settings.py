@@ -26,11 +26,9 @@ SECRET_KEY = 'j@ga-lfs(t7)r96wwqqilo%wx0e%vhi$f6z$rlj6g7q5anfb9h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
-
-COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', False)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
