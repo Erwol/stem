@@ -26,7 +26,7 @@ SECRET_KEY = 'j@ga-lfs(t7)r96wwqqilo%wx0e%vhi$f6z$rlj6g7q5anfb9h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['https://stem-uca.herokuapp.com', 'http://stem-uca.herokuapp.com']
 
 # Application definition
 
@@ -155,6 +155,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
