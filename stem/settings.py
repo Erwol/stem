@@ -24,11 +24,13 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'j@ga-lfs(t7)r96wwqqilo%wx0e%vhi$f6z$rlj6g7q5anfb9h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['.herokuapp.com']
 
 # Application definition
+
+COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', False)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -156,7 +158,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_ROOT, 'static'),
+]
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
@@ -164,7 +168,6 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CKEDITOR_UPLOAD_PATH = MEDIA_URL
 
 
 # Update database configuration with $DATABASE_URL.
