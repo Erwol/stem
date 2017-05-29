@@ -66,11 +66,9 @@ def play_game(request, game_id):
     request.session["game_id"] = game.id
     request.session["story_id"] = story.id
     request.session["actual_question"] = game.actual_question # Pregunta actual, inicializada a 0
-    print("PRGUNTA ACRUAL: " + str(request.session["actual_question"]))
     request.session['attemps_made'] = 0
 
     return redirect('game:game-controller')
-
 
 
 

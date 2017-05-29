@@ -29,7 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-# export CLOUDINARY_URL=cloudinary://316331311948145:wkoN-H1ZDVdXYXK0TPpA5u2KPHY@ddxfdtel4
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

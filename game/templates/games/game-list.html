@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
 {% block contenido %}
+
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+
 <div style="padding-bottom: 35%;">
     <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
@@ -31,7 +50,7 @@
                 </a>
             </div>
             <div class="row centered" style="padding-top: 5%;">
-                <a class="btn btn-default btn-lg btn-block" href="{% url 'game:game-create' %}">
+                <a class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#pointsModal">
                     Mis puntuaciones
                 </a>
             </div>
@@ -53,18 +72,80 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Partidas en juego</h4>
+                <h4 class="modal-title centered">Partidas en juego</h4>
             </div>
             <div class="modal-body">
-                {% for game in object_list %}
-                    {% if not game.is_finished %}
-                        <a href="{% url 'game:play-game' game_id=game.id %}">Continuar con la partida {{ game.id }}</a>
-                        <br>
-                {% endif %}
-                {% endfor %}
+                <table>
+                    <tr>
+                        <th>Historia</th>
+                        <th>Progreso</th>
+                        <th>Continuar</th>
+                        <th>Borrar</th>
+                    </tr>
+                    {% for game in object_list %}
+                        {% if not game.is_finished %}
+                            <tr>
+                                <td>{{ game.story }}</td>
+                                <td>{{ game.actual_question }}</td>
+                                <td>
+                                    <a class="btn btn-sm btn-block btn-success" href="{% url 'game:play-game' game_id=game.id %}">
+                                        <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger btn-block btn-sm" href="{% url 'game:game-delete' pk=game.id %}">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+
+                </table>
+
+
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="pointsModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title centered">Puntuaciones</h4>
+            </div>
+            <div class="modal-body">
+
+
+                <table>
+                    <tr>
+                        <th>Puntuación</th>
+                        <th>Historia</th>
+                        <th>Fecha</th>
+                    </tr>
+                    {% for game in object_list %}
+                        {% if game.is_finished %}
+                            <tr>
+                                <td>{{ game.points|floatformat:-2 }}</td>
+                                <td>{{ game.story }}</td>
+                                <td>{{ game.end_date }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+
+                </table>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
 
