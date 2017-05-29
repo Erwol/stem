@@ -96,7 +96,7 @@ class Question(Base):
     type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default='TEXTO', max_length=128, help_text=_("Texto, cuestionario, etc"))
     image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True, blank=True)
     text = models.TextField(_("Enunciado de la pregunta."))
-    
+
     class Meta:
         verbose_name = _("Pregunta")
         verbose_name_plural = _("Preguntas")

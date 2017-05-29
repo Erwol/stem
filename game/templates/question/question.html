@@ -1,28 +1,152 @@
 {% extends "base.html" %}
 
 {% block contenido %}
+
+<div class="container">
+    <div class="row centered">
+        <!-- Título de la pregunta -->
+        {% if question.type != "VINETA" %}
+            <h3 style="color:white;">Enunciado</h3>
+        {% endif %}
+        <h3 style="color:white;">{{ question.text|safe }}</h3>
+        <hr>
+    </div>
+
+    {% if question.image %}
+
+    <div class="row">
+        <!-- Versión con imagen -->
+        <div class="col-lg-6">
+            <img src="{{ question.image.url }}" class="img-thumbnail" height="600" width="500">
+        </div>
+        <div class="col-lg-6">
+            <div class="row centered">
+                <h3 style="color:white;">Respuesta</h3>
+            </div>
+            <div class="row ">
+                <form id="form" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
+                {% csrf_token %}
+
+                {% if question.type == "TEXTO" %}
+
+                    <input type="text" class="form-control" placeholder="Respuesta" name="answer">
+
+                {% elif question.type == "CUESTIONARIO" %}
+
+                    {% for answer in answers %}
+
+                        <fieldset class="form-group">
+                            <div class="form-check col-lg-3">
+                                <input id="quest" class="form-check-input" type="radio" name="answer" value="{{ answer.id }}">
+                                <label for="quest" class="form-check-label"><h2 style="color:white;">{{ answer.text }}</h2></label>
+                            </div>
+                        </fieldset>
+
+                    {% endfor %}
+
+                {% endif %}
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    <div class="col-lg-6">
+                        <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
+                        {% if cheat_number > 0 %}
+                        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
+                        {% endif %}
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% elif question.type == "VINETA" %}
+
+    <div class="row centered">
+        <!-- Versión con imagen grande -->
+        <div class="col-lg-12">
+            <img src="{{ question.image.url }}" class="img-thumbnail" height="600" width="500">
+        </div>
+    </div>
+
+    {% elif not question.image %}
+
+    <div class="row">
+        <!-- Versión sin imagen -->
+        <div class="col-lg-12">
+            <div class="row centered">
+                <h3 style="color:white;">Respuesta</h3>
+            </div>
+            <div class="row">
+
+                <form id="form2" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
+                {% csrf_token %}
+                <div class="col-lg-6 col-lg-push-3">
+                {% if question.type == "TEXTO" %}
+
+                    <input type="text" class="form-control" placeholder="Respuesta" name="answer">
+
+                {% elif question.type == "CUESTIONARIO" %}
+
+                    {% for answer in answers %}
+
+                        <fieldset class="form-group">
+                            <div class="form-check col-lg-3">
+                                <input id="quest" class="form-check-input" type="radio" name="answer" value="{{ answer.id }}">
+                                <label for="quest" class="form-check-label"><h2 style="color:white;">{{ answer.text }}</h2></label>
+                            </div>
+                        </fieldset>
+
+                    {% endfor %}
+
+                {% endif %}
+                    <hr>
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    <div class="col-lg-6 col-lg-push-3  ">
+                        <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
+                        {% if cheat_number > 0 %}
+                        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
+                        {% endif %}
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!--
 <div class="container">
     <div class="row">
+
         <div class="col-lg-6">
             {% if question.image %}
             <img src="{{ question.image.url }}" class="img-thumbnail" height="600" width="500">
             {% endif %}
         </div>
+
+
         {% if question.image %}
-        <div class="col-lg-6 centered">
-            {% endif %}
-            {% if not question.image %}
+            <div class="col-lg-6 centered">
+        {% endif %}
+
+        {% if not question.image %}
             <div class="col-lg-12 centered">
-                {% endif %}
-                <h2><strong>{{ question.text }}</strong></h2>
+        {% endif %}
+
+                <h2 class="center-block" style="color:white;"><strong>{{ question.text|safe }}</strong></h2>
             </div>
 
             <form id="form" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
                 {% csrf_token %}
+
                 {% if question.type == "TEXTO" %}
-                {% if question.image %}
-                <div class="col-lg-6">
+
+                    {% if question.image %}
+                        <div class="col-lg-6">
                     {% endif %}
+
                     {% if not question.image %}
                     <div class="col-lg-12">
                         {% endif %}
@@ -35,39 +159,32 @@
                         <div class="row form-group"></div>
                     </div>
                     {% elif question.type == "CUESTIONARIO" %}
-                    {% for answer in answers %}
-                    <fieldset class="form-group">
-                        <div class="form-check col-lg-3">
-                            <label class="form-check-label">
-                                <h2><input class="form-check-input" type="radio" name="answer" value="{{ answer.id }}">
-                                    {{ answer.text }}</h2>
-                            </label>
-                        </div>
-                    </fieldset>
-                    {% endfor %}
+                        {% for answer in answers %}
+
+                            <fieldset class="form-group">
+                                <div class="form-check col-lg-3">
+                                    <input id="quest" class="form-check-input" type="radio" name="answer" value="{{ answer.id }}">
+                                    <label for="quest" class="form-check-label"><h2>{{ answer.text }}</h2></label>
+                                </div>
+                            </fieldset>
+
+                        {% endfor %}
+
                     {% endif %}
+
                     <input type="hidden" name="question_id" value="{{ question.id }}">
-                    <div class="col-lg-1">
+                    <div class="col-lg-6">
                         <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
+                        {% if cheat_number > 0 %}
+                        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
+                        {% endif %}
                     </div>
             </form>
-            <div class="row form-group"></div>
-            <div class="row form-group"></div>
         </div>
 
+-->
 
         {% if cheat_number > 0 %}
-        <div class="row">
-            {% if question.image %}
-            <div class="col-lg-5 centered">
-                {% endif %}
-                {% if not question.image %}
-                <div class="col-lg-1 centered">
-                    {% endif %}
-                    <a class="btn btn-default btn-sm" id="cheat">¡Dame pistas!</a>
-                </div>
-            </div>
-        </div>
             <script>
 
 
