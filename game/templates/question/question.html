@@ -12,7 +12,7 @@
         <hr>
     </div>
 
-    {% if question.image %}
+    {% if question.image and question.type != "VINETA" %}
 
     <div class="row">
         <!-- Versión con imagen -->
@@ -61,7 +61,7 @@
     {% elif question.type == "VINETA" %}
 
     <div class="row centered">
-        <!-- Versión con imagen grande -->
+        <!-- Versión viñeta -->
         {% if question.image %}
         <div class="col-lg-12">
             <img src="{{ question.image.url }}" class="img-thumbnail" height="600" width="500">
@@ -72,13 +72,13 @@
         <div class="col-lg-6 col-lg-push-3  ">
         <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
         {% if cheat_number > 0 %}
-        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
+        <input type="submit" class="btn btn-warning btn-lg btn-block" id="cheat" value="Pista"/>
         {% endif %}
         </div>
         </form>
     </div>
 
-    {% elif not question.image %}
+    {% elif not question.image and question.type != "VINETA" %}
 
     <div class="row">
         <!-- Versión sin imagen -->
