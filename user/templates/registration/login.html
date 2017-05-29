@@ -23,12 +23,15 @@
 				<div class="col-lg-6">
                   <h1><strong>TORCUATO JONES</strong></h1>
 					<h1>Login</h1>
+                    <button class="btn btn-warning btn-lg">dfg</button>
 					<form method="post" class="form-horizontal" role="form">
 					  <div class="form-group">
 					        {% csrf_token %}
                             {% bootstrap_field form.username field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
                             {% bootstrap_field form.password field_class="col-md-5" show_label=False layout="horizontal" size="small"  %}
-                        <button type="submit" class="btn btn-warning btn-lg">Entrar</button>
+
+                          <button type="submit" class="btn btn-warning btn-lg">Entrar</button>
+
 					  </div>
 					</form>
 				</div><!-- /col-lg-6 -->

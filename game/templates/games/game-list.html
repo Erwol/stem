@@ -13,13 +13,13 @@
         </div>
     </div>
 
-    <div class="container col-md-push-4 col-xs-6 col-sm-4">
+    <div class="container col-md-push-4 col-xs-12 col-sm-4">
         <h1 class="centered">
             ¡Hola, {{ user }}!
         </h1>
         <h2 class="centered" style="color: white;">¿Qué quieres hacer?</h2>
 
-        <div class="container col-lg-push-3 col-sm-6">
+        <div class="container col-sx-12 col-md-push-3 col-sm-6">
             <div class="row centered" style="padding-top: 5%;">
                 <a class="btn btn-success btn-lg btn-block" href="{% url 'game:game-create' %}">
                     Comenzar partida
@@ -59,7 +59,7 @@
                 {% for game in object_list %}
                     {% if not game.is_finished %}
                         <a href="{% url 'game:play-game' game_id=game.id %}">Continuar con la partida {{ game.id }}</a>
-                        <bR>
+                        <br>
                 {% endif %}
                 {% endfor %}
             </div>

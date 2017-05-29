@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
 from ckeditor.fields import RichTextField
 from datetime import datetime
+from cloudinary.models import CloudinaryField
 # Create your models here.
 
 
@@ -94,7 +95,9 @@ class Question(Base):
     )
 
     type = models.CharField(_("Tipo de pregunta"), choices=QUESTION_TYPES, default='TEXTO', max_length=128, help_text=_("Texto, cuestionario, etc"))
-    image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True, blank=True)
+    # image = models.ImageField(_("Imagen que se mostrará en la cabecera de la pregunta"), null=True, blank=True)
+    # external_image = models.CharField(_("Enlace a la imagen"), max_length=512, help_text=_("Heroku elimina todos los archivos subidos x tiempo"), blank=True)
+    image = CloudinaryField('image')
     text = models.TextField(_("Enunciado de la pregunta."))
 
     class Meta:
