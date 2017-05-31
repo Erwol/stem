@@ -126,7 +126,23 @@
     {% endif %}
 
 </div>
+        <div id="cheatModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 id="cheat-title" class="modal-title centered">Pista número </h4>
+                        </div>
+                        <div id="cheat-text" class="modal-body centered">
 
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         {% if cheat_number > 0 %}
             <script>
 
@@ -137,7 +153,7 @@
 
 
                 document.getElementById("cheat").addEventListener("click", function () {
-
+                    /*
                     if (confirm("¡Usar pistas te restará puntos! ¿Quieres continuar?") == false) {
                         return;
                     }
@@ -145,6 +161,7 @@
                         alert("No hay más pistas disponibles, ¡ya deberias saberlo!");
                         return;
                     }
+                    */
                     var request = new XMLHttpRequest();
 
                     request.open('GET', '/question-cheat/' + question_id + '/' + cheat_count, true);
@@ -154,10 +171,33 @@
                         if (request.status >= 200 && request.status < 400) {
                             // Success!
                             var resp = request.responseText;
-                            alert("Pista: " + resp + " número " + cheat_count);
-                            console.log(cheat_count + ", " + question_id);
+                            var num = "Pista";
+
+                            if(cheat_count == 0)
+                                num = "Primera pista";
+                            else if(cheat_count==1)
+                                num = "Segunda pista";
+                            else if (cheat_count == 2)
+                                num = "Tercera pista";
+                            else if (cheat_count==3)
+                                num = "Cuarta pista";
+                            else if(cheat_count==4)
+                                num = "Quinta pista";
+                            document.getElementById('cheat-title').innerText = num;
+                            document.getElementById('cheat-text').innerText = resp;
+
+                            $(document).ready(function () {
+                                    $("#cheatModal").modal('show');
+                            });
                             cheat_count++;
                         } else {
+                            document.getElementById('cheat-title').innerText = "¡No hay más pistas!";
+                            document.getElementById('cheat-text').innerText = "";
+                            var button = document.getElementById("cheat");
+                             $(document).ready(function () {
+                                    $("#cheatModal").modal('show');
+                            });
+                            button.parentNode.removeChild(button);
                             console.log("Error con el servidor");
                         }
                     };
@@ -173,6 +213,8 @@
 
 
             </script>
+
+
             {% endif %}
 
         <div class="row form-group"></div>
