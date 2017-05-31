@@ -210,7 +210,7 @@ def get_cheat(request, question_id, cheat_count):
     question = get_object_or_404(Question, pk=question_id)
     if Cheat.objects.filter(question=question)[int(cheat_count)]:
         # TODO Quitar 1 punto de la pregunta por pista pedida
-
+        print(cheat_count)
         request.session["penalty"] += 1
         cheat = Cheat.objects.filter(question=question)[int(cheat_count)]
         return HttpResponse(cheat.text, status=200)

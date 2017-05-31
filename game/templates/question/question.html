@@ -49,7 +49,7 @@
                     <div class="col-lg-6">
                         <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
                         {% if cheat_number > 0 %}
-                        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
+                        <input type="button" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
                         {% endif %}
                     </div>
 
@@ -72,7 +72,7 @@
         <div class="col-lg-6 col-lg-push-3  ">
         <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
         {% if cheat_number > 0 %}
-        <input type="submit" class="btn btn-warning btn-lg btn-block" id="cheat" value="Pista"/>
+        <input type="button" class="btn btn-warning btn-lg btn-block" id="cheat" value="Pista"/>
         {% endif %}
         </div>
         </form>
@@ -114,7 +114,7 @@
                     <div class="col-lg-6 col-lg-push-3  ">
                         <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
                         {% if cheat_number > 0 %}
-                        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
+                        <input type="button" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
                         {% endif %}
                     </div>
                     </div>
@@ -127,74 +127,6 @@
 
 </div>
 
-<!--
-<div class="container">
-    <div class="row">
-
-        <div class="col-lg-6">
-            {% if question.image %}
-            <img src="{{ question.image.url }}" class="img-thumbnail" height="600" width="500">
-            {% endif %}
-        </div>
-
-
-        {% if question.image %}
-            <div class="col-lg-6 centered">
-        {% endif %}
-
-        {% if not question.image %}
-            <div class="col-lg-12 centered">
-        {% endif %}
-
-                <h2 class="center-block" style="color:white;"><strong>{{ question.text|safe }}</strong></h2>
-            </div>
-
-            <form id="form" action="{% url 'game:save-response' %}" onsubmit="return ValidateAttempts()" method="post">
-                {% csrf_token %}
-
-                {% if question.type == "TEXTO" %}
-
-                    {% if question.image %}
-                        <div class="col-lg-6">
-                    {% endif %}
-
-                    {% if not question.image %}
-                    <div class="col-lg-12">
-                        {% endif %}
-                        <div class="row form-group"></div>
-                        <div class="row form-group"></div>
-                        <div class="input-group centered">
-                            <input type="text" class="form-control" placeholder="Respuesta" name="answer">
-                        </div>
-                        <div class="row form-group"></div>
-                        <div class="row form-group"></div>
-                    </div>
-                    {% elif question.type == "CUESTIONARIO" %}
-                        {% for answer in answers %}
-
-                            <fieldset class="form-group">
-                                <div class="form-check col-lg-3">
-                                    <input id="quest" class="form-check-input" type="radio" name="answer" value="{{ answer.id }}">
-                                    <label for="quest" class="form-check-label"><h2>{{ answer.text }}</h2></label>
-                                </div>
-                            </fieldset>
-
-                        {% endfor %}
-
-                    {% endif %}
-
-                    <input type="hidden" name="question_id" value="{{ question.id }}">
-                    <div class="col-lg-6">
-                        <input type="submit" class="btn btn-success btn-lg" value="Siguiente"/>
-                        {% if cheat_number > 0 %}
-                        <input type="submit" class="btn btn-warning btn-lg" id="cheat" value="Pista"/>
-                        {% endif %}
-                    </div>
-            </form>
-        </div>
-
--->
-
         {% if cheat_number > 0 %}
             <script>
 
@@ -203,7 +135,9 @@
                 var cheat_number = "{{ cheat_number }}"; // Número de pistas máximo
                 var question_id = "{{ question.id }}";
 
+
                 document.getElementById("cheat").addEventListener("click", function () {
+
                     if (confirm("¡Usar pistas te restará puntos! ¿Quieres continuar?") == false) {
                         return;
                     }
@@ -212,6 +146,7 @@
                         return;
                     }
                     var request = new XMLHttpRequest();
+
                     request.open('GET', '/question-cheat/' + question_id + '/' + cheat_count, true);
 
                     request.onload = function () {
@@ -219,7 +154,7 @@
                         if (request.status >= 200 && request.status < 400) {
                             // Success!
                             var resp = request.responseText;
-                            alert("Pista: " + resp);
+                            alert("Pista: " + resp + " número " + cheat_count);
                             console.log(cheat_count + ", " + question_id);
                             cheat_count++;
                         } else {
