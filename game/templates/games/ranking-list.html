@@ -18,7 +18,29 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container" style="background-color: white; border-radius: 25px;   border: 2px solid; padding-top: 1%;">
+        <h1 class="centered" style="color:black;">Ranking</h1>
+        <table class="table table-hover table-striped">
+            <tr>
+                <th>Usuario</th>
+                <th>Puntuación</th>
+                <th>Historia</th>
+                <th>Fecha</th>
+            </tr>
+            {% for game in object_list %}
+            {% if game.is_finished %}
+            <tr>
+                <td>{{ game.user.username }}</td>
+                <td>{{ game.points|floatformat:-2 }}</td>
+                <td>{{ game.story }}</td>
+                <td>{{ game.end_date }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+
+        </table>
+
+        <!--
         <div class="row centered">
             <div class="col-lg-4">
                 <h1><strong>Usuario</strong></h1>
@@ -45,6 +67,7 @@
             </div>
         {% endif %}
         {% endfor %}
+        -->
     </div>
 
 {% endblock %}
