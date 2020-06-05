@@ -1,7 +1,7 @@
 appdirs==1.4.3
 cloudinary==1.8.0
 dj-database-url==0.4.2
-Django==1.11
+Django==1.11.29
 django-bootstrap3==8.2.3
 django-ckeditor==5.2.2
 freeze==1.0.10
